@@ -66,7 +66,7 @@ const data: {
 
 export default function Page() {
   return (
-    <div className="container mx-auto space-y-6 p-4 sm:p-6">
+    <div className="space-y-6">
       {data.map((item) => (
         <Item key={item.id} className="p-0 flex-nowrap items-stretch">
           <a

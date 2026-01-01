@@ -6,5 +6,5 @@ import { useUserStore } from "@/providers/user-store-provider";
 export default function ProfileButton() {
   const user = useUserStore((e) => e.user);
 
-  return <Button variant={"ghost"}>{user?.nickname}</Button>;
+  return <Button variant={"link"}>{user!.nickname}</Button>;
 }

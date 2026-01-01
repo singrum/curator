@@ -12,20 +12,18 @@ import SubmitButton from "./submit-button";
 export default function Header() {
   const user = useUserStore((e) => e.user);
   return (
-    <header className="h-12 flex bg-muted">
-      <div className="mx-auto px-2 sm:px-4 items-center flex justify-between container">
-        <Button className="px-2" variant={"ghost"} asChild>
-          <Link href="/">
-            <Logo />
-          </Link>
-        </Button>
-        <div className="flex items-center gap-2 h-4">
-          <SubmitButton />
-          {/* <Separator className="h-full" orientation="vertical" />
+    <header className="px-2 sm:px-4 items-center flex justify-between container h-12">
+      <Button className="px-2" variant={"ghost"} asChild>
+        <Link href="/">
+          <Logo />
+        </Link>
+      </Button>
+      <div className="flex items-center gap-2 h-4">
+        <SubmitButton />
+        {/* <Separator className="h-full" orientation="vertical" />
           <ModeToggle /> */}
-          <Separator className="h-full" orientation="vertical" />
-          {user ? <ProfileButton /> : <LoginButton />}
-        </div>
+        <Separator className="h-full" orientation="vertical" />
+        {user ? <ProfileButton /> : <LoginButton />}
       </div>
     </header>
   );

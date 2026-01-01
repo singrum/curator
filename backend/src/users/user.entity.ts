@@ -1,7 +1,9 @@
+import { Article } from 'src/articles/article.entity';
 import {
   Column,
   CreateDateColumn,
   Entity,
+  OneToMany,
   PrimaryGeneratedColumn,
 } from 'typeorm';
 @Entity()
@@ -20,4 +22,8 @@ export class User {
 
   @CreateDateColumn()
   createdAt: Date;
+
+  // 추가된 관계: 한 명의 유저는 여러 개의 게시글을 가질 수 있음
+  @OneToMany(() => Article, (article) => article.author)
+  articles: Article[];
 }

@@ -37,7 +37,7 @@ export default async function RootLayout({
         >
           <UserStoreProvider user={user} key={user === null ? "null" : user.id}>
             <Header />
-            {children}
+            <main className="container  p-4 sm:p-6">{children}</main>
           </UserStoreProvider>
         </ThemeProvider>
       </body>
