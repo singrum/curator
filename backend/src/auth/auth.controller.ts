@@ -80,13 +80,32 @@ export class AuthController {
 
   @Auth()
   @Get('me')
-  getProfile(@Req() req: Request) {
-    // 가드(JwtAuthGuard)에서 성공하면 req.user가 채워져서 옵니다.
-    if (!req.user) return { loggedIn: false };
-    console.log(req.user);
-    return {
-      loggedIn: true,
-      user: req.user,
-    };
+  async getProfile(@Req() req: Request) {
+    // 1. 가드에서 넣어준 req.user (예: { id: 1 })를 가져옵니다.
+    // 가드에서 인증에 실패하면 이 컨트롤러에 도달하지 못하므로 null 체크는 간단하게 합니다.
+    const authUser = req.user as { id: number };
+
+    console.log(authUser);
+    if (!authUser || !authUser.id) {
+      return { loggedIn: false };
+    }
+
+    try {
+      // 2. 비즈니스 로직에 필요한 전체 유저 정보를 DB에서 조회합니다.
+      const user = await this.usersService.findById(authUser.id);
+
+      if (!user) {
+        return { loggedIn: false };
+      }
+
+      // 3. 최종 유저 엔티티 객체 반환
+      return {
+        loggedIn: true,
+        user,
+      };
+    } catch (error) {
+      console.error('getProfile error:', error);
+      return { loggedIn: false };
+    }
   }
 }

@@ -13,6 +13,7 @@ export async function getUser(): Promise<User | null> {
       },
       cache: "no-store",
     });
+    console.log(res);
 
     if (!res.ok) {
       const errorBody = await res.json().catch(() => ({}));
