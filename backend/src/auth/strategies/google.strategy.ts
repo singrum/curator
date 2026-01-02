@@ -8,7 +8,6 @@ import { ConfigService } from '@nestjs/config';
 @Injectable()
 export class GoogleStrategy extends PassportStrategy(Strategy, 'google') {
   constructor(private readonly config: ConfigService) {
-    console.log(config.get('GOOGLE_CLIENT_ID'));
     const options: StrategyOptions = {
       clientID: config.get('GOOGLE_CLIENT_ID')!,
       clientSecret: config.get('GOOGLE_CLIENT_SECRET')!,

@@ -3,7 +3,9 @@ import { ConfigModule } from '@nestjs/config';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { AuthModule } from './auth/auth.module';
 import { OAuthModule } from './oauth/oauth.module';
+import { TopicsModule } from './topics/topics.module';
 import { UsersModule } from './users/users.module';
+import { VideosModule } from './videos/videos.module';
 
 @Module({
   imports: [
@@ -20,6 +22,8 @@ import { UsersModule } from './users/users.module';
     AuthModule, // ⭐️ 필수
     UsersModule,
     OAuthModule,
+    TopicsModule,
+    VideosModule,
   ],
 })
 export class AppModule {}

@@ -1,4 +1,4 @@
-import { Article } from 'src/articles/article.entity';
+import { Video } from 'src/videos/entities/video.entity';
 import {
   Column,
   Entity,
@@ -16,6 +16,6 @@ export class Topic {
   @Column({ length: 50 }) // 태그명 길이 제한 (인덱스 최적화)
   name: string;
 
-  @ManyToMany(() => Article, (article) => article.topics)
-  articles: Article[];
+  @ManyToMany(() => Video, (video) => video.topics)
+  videos: Video[];
 }

@@ -23,8 +23,10 @@ import { GoogleStrategy } from './strategies/google.strategy';
         signOptions: { expiresIn: '1h' },
       }),
     }),
+    AuthModule,
   ],
   controllers: [AuthController],
   providers: [AuthService, GoogleStrategy],
+  exports: [AuthService, JwtModule],
 })
 export class AuthModule {}

@@ -10,12 +10,13 @@ import { AuthService } from '../auth.service';
 
 import { Request, Response } from 'express';
 
-export interface RequestWithCookies extends Request {
+export interface RequestWithUser extends Request {
   cookies: {
     jwt?: string;
     refresh_token?: string;
     [key: string]: string | undefined; // 다른 쿠키들도 허용하되 타입을 string으로 제한
   };
+  user: { id: number };
 } // src/auth/guards/jwt-auth.guard.ts
 
 @Injectable()
@@ -26,7 +27,7 @@ export class JwtAuthGuard implements CanActivate {
   ) {}
 
   async canActivate(context: ExecutionContext): Promise<boolean> {
-    const req = context.switchToHttp().getRequest<RequestWithCookies>();
+    const req = context.switchToHttp().getRequest<RequestWithUser>();
     const res = context.switchToHttp().getResponse<Response>();
 
     const accessToken = req.cookies?.['jwt'];

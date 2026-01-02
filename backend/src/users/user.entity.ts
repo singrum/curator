@@ -1,4 +1,4 @@
-import { Article } from 'src/articles/article.entity';
+import { Video } from 'src/videos/entities/video.entity';
 import {
   Column,
   CreateDateColumn,
@@ -24,6 +24,6 @@ export class User {
   createdAt: Date;
 
   // 추가된 관계: 한 명의 유저는 여러 개의 게시글을 가질 수 있음
-  @OneToMany(() => Article, (article) => article.author)
-  articles: Article[];
+  @OneToMany(() => Video, (video) => video.submitter)
+  videos: Video[];
 }

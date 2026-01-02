@@ -6,6 +6,7 @@ import type { Request, Response } from 'express';
 import { UsersService } from 'src/users/users.service';
 import { AuthService } from './auth.service';
 import { Auth } from './decorators/auth.decorator';
+import type { RequestWithUser } from './guards/jwt-auth.guard';
 import { OAuthProfile } from './types/oauth-profile';
 
 @Controller('auth')
@@ -35,8 +36,7 @@ export class AuthController {
     const { accessToken, refreshToken } =
       await this.authService.oauthLogin(user);
     // 디버깅 로그 추가
-    console.log('Generated AccessToken:', accessToken);
-    console.log('Generated RefreshToken:', refreshToken);
+
     // Access token
     res.cookie('jwt', accessToken, {
       httpOnly: true,
@@ -80,12 +80,11 @@ export class AuthController {
 
   @Auth()
   @Get('me')
-  async getProfile(@Req() req: Request) {
+  async getProfile(@Req() req: RequestWithUser) {
     // 1. 가드에서 넣어준 req.user (예: { id: 1 })를 가져옵니다.
     // 가드에서 인증에 실패하면 이 컨트롤러에 도달하지 못하므로 null 체크는 간단하게 합니다.
-    const authUser = req.user as { id: number };
+    const authUser = req.user;
 
-    console.log(authUser);
     if (!authUser || !authUser.id) {
       return { loggedIn: false };
     }

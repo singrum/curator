@@ -1,8 +1,9 @@
-import { getUser } from "@/lib/api/auth";
+import { getUser } from "@/lib/actions/auth";
 import { ThemeProvider } from "@/providers/theme-provider";
 import { UserStoreProvider } from "@/providers/user-store-provider";
 import type { Metadata } from "next";
 import { Noto_Sans_KR } from "next/font/google";
+import { Toaster } from "sonner";
 import Header from "./_component/header";
 import "./globals.css";
 
@@ -21,14 +22,14 @@ export default async function RootLayout({
   children: React.ReactNode;
 }>) {
   const user = await getUser();
-  console.log(user);
+
   return (
     <html
       lang="ko"
       suppressHydrationWarning
       className={`${NotoSansKr.className} antialiased`}
     >
-      <body>
+      <body className="min-h-screen flex flex-col">
         <ThemeProvider
           attribute="class"
           defaultTheme="system"
@@ -37,7 +38,8 @@ export default async function RootLayout({
         >
           <UserStoreProvider user={user} key={user === null ? "null" : user.id}>
             <Header />
-            <main className="container  p-4 sm:p-6">{children}</main>
+            <main className="container p-4 sm:p-6 mx-auto">{children}</main>
+            <Toaster />
           </UserStoreProvider>
         </ThemeProvider>
       </body>
