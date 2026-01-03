@@ -1,5 +1,14 @@
 // src/auth/auth.controller.ts
-import { Controller, Get, Post, Req, Res, UseGuards } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Get,
+  Patch,
+  Post,
+  Req,
+  Res,
+  UseGuards,
+} from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import { AuthGuard } from '@nestjs/passport';
 import type { Request, Response } from 'express';
@@ -106,5 +115,19 @@ export class AuthController {
       console.error('getProfile error:', error);
       return { loggedIn: false };
     }
+  }
+
+  @Auth() // 이전에 만든 JwtAuthGuard 적용
+  @Patch('nickname')
+  async changeNickname(@Req() req: any, @Body('nickname') nickname: string) {
+    return this.usersService.updateNickname(req.user.id, nickname);
+  }
+
+  @Post('logout')
+  async logout(@Res({ passthrough: true }) res: Response) {
+    // 쿠키 만료 처리
+    res.clearCookie('jwt', { path: '/' });
+    res.clearCookie('refresh_token', { path: '/' });
+    return { message: 'Logged out' };
   }
 }

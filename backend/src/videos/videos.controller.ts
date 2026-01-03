@@ -7,6 +7,7 @@ import {
   Param,
   Patch,
   Post,
+  Query,
   Req,
 } from '@nestjs/common';
 import { Auth } from 'src/auth/decorators/auth.decorator';
@@ -38,8 +39,8 @@ export class VideosController {
   }
 
   @Get()
-  findAll() {
-    return this.videosService.findAll();
+  async findAll(@Query('page') page: number = 1) {
+    return await this.videosService.findAll(page, 10);
   }
 
   @Get(':id')

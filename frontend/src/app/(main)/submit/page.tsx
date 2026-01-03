@@ -90,15 +90,13 @@ export default function Page() {
           placeholder="https://www.youtube.com/watch?v=..."
           value={url}
           onChange={handleUrlChange}
-          className={
-            isInvalidUrl
-              ? "border-destructive focus-visible:ring-destructive"
-              : ""
-          }
+          className={cn("max-w-md ", {
+            "border-destructive focus-visible:ring-destructive": isInvalidUrl,
+          })}
         />
         {isInvalidUrl && (
           <p className="text-destructive text-sm font-medium">
-            유효한 유튜브 주소를 입력해주세요.
+            유효한 유튜브 영상 주소를 입력해주세요.
           </p>
         )}
       </div>

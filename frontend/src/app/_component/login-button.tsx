@@ -1,16 +1,10 @@
-"use client";
-
 import { Button } from "@/components/ui/button";
+import Link from "next/link";
 
 export default function LoginButton() {
   return (
-    <Button
-      variant={"ghost"}
-      onClick={() => {
-        window.location.href = "/auth/login";
-      }}
-    >
-      로그인
+    <Button variant={"link"} asChild>
+      <Link href="/login">로그인</Link>
     </Button>
   );
 }

@@ -1,6 +1,8 @@
+// src/lib/actions/video.ts
 "use server";
 
 import { redirect } from "next/navigation";
+import { Video, VideoPaginationResponse } from "../types";
 import { getUser } from "./auth";
 import { api } from "./axios";
 
@@ -23,5 +25,27 @@ export async function createVideo(videoId: string) {
   // 핵심: try-catch가 완전히 종료된 후 redirect를 호출합니다.
   if (success) {
     redirect("/submit/success");
+  }
+}
+
+export async function getVideos(
+  page: number = 1
+): Promise<VideoPaginationResponse> {
+  try {
+    const { data } = await api.get(`/videos?page=${page}`);
+    return data;
+  } catch (error) {
+    console.error("Fetch Videos Error:", error);
+    return { items: [], meta: { total: 0, lastPage: 1, page } };
+  }
+}
+
+export async function getVideoDetail(videoId: string): Promise<Video | null> {
+  try {
+    const { data } = await api.get(`/videos/${videoId}`);
+    return data;
+  } catch (error) {
+    console.error("Fetch Video Detail Error:", error);
+    return null;
   }
 }

@@ -36,7 +36,10 @@ export default async function RootLayout({
           enableSystem
           disableTransitionOnChange
         >
-          <UserStoreProvider user={user} key={user === null ? "null" : user.id}>
+          <UserStoreProvider
+            user={user}
+            key={user === null ? "null" : user.id + "," + user.nickname}
+          >
             <Header />
             <main className="container p-4 sm:p-6 mx-auto">{children}</main>
             <Toaster />
