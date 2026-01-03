@@ -3,6 +3,7 @@
 
 import { redirect } from "next/dist/client/components/navigation";
 
+import { isAxiosError } from "axios";
 import { revalidatePath } from "next/cache";
 import { cookies } from "next/headers";
 import { User } from "../types";
@@ -44,6 +45,22 @@ export async function updateNickname(
     revalidatePath("/");
     return { success: true };
   } catch (error) {
-    return { success: false, message: "닉네임 변경 중 오류 발생" };
+    if (isAxiosError(error)) {
+      const serverMessage = error.response?.data?.message;
+      const errorMessage = Array.isArray(serverMessage)
+        ? serverMessage[0]
+        : serverMessage;
+
+      return {
+        success: false,
+        message: errorMessage || "닉네임 변경 중 오류가 발생했습니다.",
+      };
+    }
+
+    // 2. 일반 에러 처리
+    return {
+      success: false,
+      message: "알 수 없는 오류가 발생했습니다.",
+    };
   }
 }

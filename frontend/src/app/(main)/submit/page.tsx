@@ -9,7 +9,6 @@ import { YoutubeOEmbed } from "@/lib/types";
 import { cn } from "@/lib/utils";
 import { getVideoById, getVideoId } from "@/lib/youtube";
 import Image from "next/image";
-import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import { toast } from "sonner";
 import { EmptyVideo } from "./_components/empty-video";
@@ -19,8 +18,7 @@ export default function Page() {
   const [video, setVideo] = useState<YoutubeOEmbed | null>(null);
   const [isLoading, setIsLoading] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const router = useRouter();
-  // 제출 함수 수정
+
   const handleSubmit = async () => {
     if (!videoId) return;
 

@@ -1,6 +1,7 @@
 // src/lib/actions/video.ts
 "use server";
 
+import { isAxiosError } from "axios";
 import { redirect } from "next/navigation";
 import { Video, VideoPaginationResponse } from "../types";
 import { getUser } from "./auth";
@@ -10,19 +11,36 @@ export async function createVideo(videoId: string) {
   const user = await getUser();
   if (!user) throw new Error("로그인이 필요합니다.");
 
-  let success = false; // 성공 여부 플래그
+  let success = false;
 
   try {
     await api.post("/videos", { videoId });
-    success = true; // 통신이 성공했을 때만 true
-  } catch (error: any) {
-    console.error("Video Create Error:", error.response?.data || error.message);
+    success = true;
+  } catch (error) {
+    // 1. Axios 에러인지 확인 (any 제거)
+    if (isAxiosError(error)) {
+      const serverMessage = error.response?.data?.message;
+
+      // NestJS의 ValidationPipe 에러(배열)와 일반 에러(문자열) 모두 대응
+      const errorMessage = Array.isArray(serverMessage)
+        ? serverMessage[0]
+        : serverMessage;
+
+      console.error(error.response?.data || error.message);
+
+      return {
+        error: errorMessage || "비디오 등록에 실패했습니다.",
+      };
+    }
+
+    // 2. Axios 에러가 아닌 일반 에러 처리
+    console.error("Unknown Error:", error);
     return {
-      error: error.response?.data?.message || "비디오 등록에 실패했습니다.",
+      error: "알 수 없는 오류가 발생했습니다.",
     };
   }
 
-  // 핵심: try-catch가 완전히 종료된 후 redirect를 호출합니다.
+  // 성공 시 리다이렉트 (try-catch 외부에서 실행)
   if (success) {
     redirect("/submit/success");
   }

@@ -1,4 +1,8 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import {
+  ConflictException,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import axios from 'axios';
 import { User } from 'src/users/user.entity';
@@ -6,6 +10,7 @@ import { Repository } from 'typeorm';
 import { CreateVideoDto } from './dto/create-video.dto';
 import { UpdateVideoDto } from './dto/update-video.dto';
 import { Video } from './entities/video.entity';
+import { YoutubeOEmbed } from './types/youtube';
 
 @Injectable()
 export class VideosService {
@@ -16,19 +21,37 @@ export class VideosService {
   async createVideo(createVideoDto: CreateVideoDto, user: User) {
     const { videoId } = createVideoDto;
 
-    // 유튜브 oEmbed API 호출
-    const { data } = await axios.get(
-      `https://www.youtube.com/oembed?url=https://www.youtube.com/watch?v=${videoId}&format=json`,
-    );
-
-    const newVideo = this.videoRepository.create({
-      videoId,
-      title: data.title,
-      authorName: data.author_name, // API에서 가져온 채널명 저장
-      submitter: user, // 로그인한 제출자 유저 객체 연결
+    // 1. 이미 등록된 비디오인지 확인
+    const existingVideo = await this.videoRepository.findOne({
+      where: { videoId },
     });
 
-    return await this.videoRepository.save(newVideo);
+    if (existingVideo) {
+      throw new ConflictException('이미 등록된 비디오입니다.');
+    }
+
+    // 2. 유튜브 oEmbed API 호출
+    try {
+      const { data } = await axios.get<YoutubeOEmbed>(
+        `https://www.youtube.com/oembed?url=https://www.youtube.com/watch?v=${videoId}&format=json`,
+      );
+
+      // 3. 비디오 생성 및 저장
+      const newVideo = this.videoRepository.create({
+        videoId,
+        title: data.title,
+        authorName: data.author_name,
+        submitter: user,
+      });
+
+      return await this.videoRepository.save(newVideo);
+    } catch (error) {
+      // 유튜브 API 호출 실패 시 에러 처리 (예: 잘못된 videoId)
+      if (axios.isAxiosError(error) && error.response?.status === 404) {
+        throw new NotFoundException('유효하지 않은 유튜브 비디오 ID입니다.');
+      }
+      throw error;
+    }
   }
   // src/videos/videos.service.ts
   async findAll(page: number = 1, limit: number = 10) {

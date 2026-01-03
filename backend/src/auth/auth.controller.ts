@@ -119,12 +119,15 @@ export class AuthController {
 
   @Auth() // 이전에 만든 JwtAuthGuard 적용
   @Patch('nickname')
-  async changeNickname(@Req() req: any, @Body('nickname') nickname: string) {
+  async changeNickname(
+    @Req() req: RequestWithUser,
+    @Body('nickname') nickname: string,
+  ) {
     return this.usersService.updateNickname(req.user.id, nickname);
   }
 
   @Post('logout')
-  async logout(@Res({ passthrough: true }) res: Response) {
+  logout(@Res({ passthrough: true }) res: Response) {
     // 쿠키 만료 처리
     res.clearCookie('jwt', { path: '/' });
     res.clearCookie('refresh_token', { path: '/' });
