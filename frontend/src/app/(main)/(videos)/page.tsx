@@ -9,7 +9,7 @@ export default async function Page({
 }) {
   const currentPage = Number((await searchParams).page) || 1;
   const { items, meta } = await getVideos(currentPage);
-  console.log(items);
+
   return (
     <div className="space-y-6">
       {items.map((item) => (

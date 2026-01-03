@@ -12,7 +12,7 @@ import { Video } from "@/lib/types";
 
 export default function VideoItem({ data }: { data: Video }) {
   return (
-    <Item key={data.id} className="p-0 flex-nowrap items-stretch">
+    <Item key={data.id} className="p-0 flex-nowrap items-stretch group">
       <a
         href={`https://www.youtube.com/watch?v=${data.videoId}`}
         target="_blank"
@@ -32,17 +32,13 @@ export default function VideoItem({ data }: { data: Video }) {
       <ItemContent className="flex flex-col justify-between">
         <div className="flex">
           <Link href={`/video/${data.id}`} className="space-y-1">
-            <ItemHeader className="break-all max-w-full overflow-hidden text-ellipsis font-semibold">
+            <ItemHeader className="break-all max-w-full overflow-hidden text-ellipsis font-semibold text-link underline-offset-2 underline group-hover:no-underline">
               {data.title}
             </ItemHeader>
-            <ItemDescription className="break-all">
+            <ItemDescription className="break-all text-foreground">
               {data.content}
             </ItemDescription>
           </Link>
-        </div>
-        <div className="text-xs text-muted-foreground">
-          curated by{" "}
-          <span className="font-semibold">{data.submitter.nickname}</span>
         </div>
       </ItemContent>
     </Item>

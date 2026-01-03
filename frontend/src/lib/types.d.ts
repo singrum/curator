@@ -3,6 +3,7 @@ export type User = {
   email: string;
   nickname: string;
   avatarUrl: string;
+  role: number;
 };
 
 export interface YoutubeOEmbed {

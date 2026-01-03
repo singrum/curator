@@ -25,6 +25,7 @@ export class AuthService {
         email,
         nickname,
         avatarUrl,
+        role: 0,
       });
 
       oauth = await this.oauthService.create({

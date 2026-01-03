@@ -28,35 +28,37 @@ export default function NicknameForm() {
   };
   return (
     <div className="space-y-6">
-      <div className="space-y-1">
+      <div className="space-y-3">
         <Label className="space-y-1 flex-col items-start">
           <div>닉네임</div>
+        </Label>
+        <div className="flex gap-2">
           <Input
-            className="max-w-md w-full"
+            className="max-w-md w-full flex-1"
             value={nickname}
             onChange={(e) => setNickname(e.target.value)}
             placeholder="새 닉네임을 입력하세요"
             disabled={isLoading}
             maxLength={20}
           />
-        </Label>
+          <Button
+            variant="secondary"
+            onClick={handleSave}
+            disabled={
+              isLoading || nickname === user?.nickname || nickname.length === 0
+            }
+          >
+            {isLoading ? (
+              <>
+                <Spinner />
+                저장 중
+              </>
+            ) : (
+              "닉네임 저장"
+            )}
+          </Button>
+        </div>
       </div>
-      <Button
-        variant="secondary"
-        onClick={handleSave}
-        disabled={
-          isLoading || nickname === user?.nickname || nickname.length === 0
-        }
-      >
-        {isLoading ? (
-          <>
-            <Spinner />
-            저장 중
-          </>
-        ) : (
-          "닉네임 저장"
-        )}
-      </Button>
     </div>
   );
 }

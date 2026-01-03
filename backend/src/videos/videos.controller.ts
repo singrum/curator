@@ -12,6 +12,7 @@ import {
 } from '@nestjs/common';
 import { Auth } from 'src/auth/decorators/auth.decorator';
 import type { RequestWithUser } from 'src/auth/guards/jwt-auth.guard';
+import { UserRole } from 'src/common/constants/role';
 import { User } from 'src/users/user.entity';
 import { CreateVideoDto } from './dto/create-video.dto';
 import { UpdateVideoDto } from './dto/update-video.dto';
@@ -22,7 +23,7 @@ export class VideosController {
   constructor(private readonly videosService: VideosService) {}
 
   @Post()
-  @Auth() // 💡 로그인한 유저만 접근 가능하도록 보호
+  @Auth(UserRole.EDITOR) // 💡 로그인한 유저만 접근 가능하도록 보호
   async create(
     @Body() createVideoDto: CreateVideoDto,
     @Req() req: RequestWithUser,
