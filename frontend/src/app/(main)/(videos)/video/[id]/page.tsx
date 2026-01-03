@@ -16,8 +16,8 @@ export default async function Page({
   }
 
   return (
-    <div className="prose dark:prose-invert max-w-full">
-      <h1>{video.title}</h1>
+    <div>
+      <h1 className="text-2xl font-bold">{video.title}</h1>
 
       <Separator className="my-4" />
       <MarkdownContent>{video.content || ""}</MarkdownContent>

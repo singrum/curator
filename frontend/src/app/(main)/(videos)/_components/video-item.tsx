@@ -39,7 +39,7 @@ export default function VideoItem({ data }: { data: Video }) {
               {data.content}
             </ItemDescription>
 
-            <ItemDescription className="text-sm text-muted-foreground">
+            <ItemDescription className="text-xs text-muted-foreground">
               {new Date(data.createdAt).toLocaleTimeString()} | 댓글{" "}
               {data.commentCount}개
             </ItemDescription>

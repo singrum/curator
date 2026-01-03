@@ -35,6 +35,7 @@ export default function CommentForm({ id }: { id: number }) {
         onChange={(e) => setValue(e.target.value)}
         disabled={isPending} // 로딩 중 입력 방지
         className="resize-none"
+        maxLength={500}
       />
       <div className="flex justify-end">
         <Button
