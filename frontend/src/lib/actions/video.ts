@@ -7,14 +7,14 @@ import { Video, VideoPaginationResponse } from "../types";
 import { getUser } from "./auth";
 import { api } from "./axios";
 
-export async function createVideo(videoId: string) {
+export async function createVideo(videoId: string, content: string) {
   const user = await getUser();
   if (!user) throw new Error("로그인이 필요합니다.");
 
   let success = false;
 
   try {
-    await api.post("/videos", { videoId });
+    await api.post("/videos", { videoId, content });
     success = true;
   } catch (error) {
     // 1. Axios 에러인지 확인 (any 제거)
@@ -42,7 +42,11 @@ export async function createVideo(videoId: string) {
 
   // 성공 시 리다이렉트 (try-catch 외부에서 실행)
   if (success) {
-    redirect("/submit/success");
+    if (content.length === 0) {
+      redirect("/submit/success");
+    } else {
+      redirect("/");
+    }
   }
 }
 

@@ -35,7 +35,9 @@ export default function VideoItem({ data }: { data: Video }) {
             <ItemHeader className="break-all max-w-full overflow-hidden text-ellipsis font-semibold">
               {data.title}
             </ItemHeader>
-            <ItemDescription className="break-all">asdfsadf</ItemDescription>
+            <ItemDescription className="break-all">
+              {data.content}
+            </ItemDescription>
           </Link>
         </div>
         <div className="text-xs text-muted-foreground">

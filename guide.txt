@@ -1,0 +1,5 @@
+1. https://aistudio.google.com/prompts/1ML7_1tZb3orZfA6TPCfs4ZbJ1bs5HQGq 에 접속한다.
+2. 프롬프트 입력창에 설명을 생성하고자 하는 유튜브 링크를 아래에 추가한다.
+3. Run을 클릭한다.
+4. 답변이 나오면, 답변에 마우스를 올리고, "More Option"을 클릭한 후, "Copy as markdown"을 클릭한다.
+5. 복사된 글을 이곳에 붙여넣기한다.

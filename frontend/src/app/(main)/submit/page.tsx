@@ -1,9 +1,12 @@
 "use client";
 
 import { Button } from "@/components/ui/button";
+import { Card, CardContent } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Spinner } from "@/components/ui/spinner";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Textarea } from "@/components/ui/textarea";
 import { createVideo } from "@/lib/actions/video";
 import { YoutubeOEmbed } from "@/lib/types";
 import { cn } from "@/lib/utils";
@@ -12,19 +15,23 @@ import Image from "next/image";
 import { useEffect, useState } from "react";
 import { toast } from "sonner";
 import { EmptyVideo } from "./_components/empty-video";
-
+import GuideDialog from "./_components/guide-dialog";
 export default function Page() {
   const [url, setUrl] = useState("");
   const [video, setVideo] = useState<YoutubeOEmbed | null>(null);
   const [isLoading, setIsLoading] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
-
+  const [content, setContent] = useState("");
+  const [contentType, setContentType] = useState<"auto" | "manual">("auto");
   const handleSubmit = async () => {
     if (!videoId) return;
 
     setIsSubmitting(true);
 
-    const result = await createVideo(videoId);
+    const result = await createVideo(
+      videoId,
+      contentType === "auto" ? "" : content
+    );
 
     if (result?.error) {
       toast.error(result.error);
@@ -125,6 +132,42 @@ export default function Page() {
       ) : (
         <EmptyVideo />
       )}
+      <div className="space-y-2">
+        <div className="text-sm font-medium">설명</div>
+        <Tabs
+          defaultValue={contentType}
+          onValueChange={(value) => setContentType(value as "auto" | "manual")}
+        >
+          <TabsList className="max-w-md w-full">
+            <TabsTrigger value="auto">자동 생성</TabsTrigger>
+            <TabsTrigger value="manual">직접 입력</TabsTrigger>
+          </TabsList>
+          <TabsContent value="auto">
+            <Card className="max-w-md w-full">
+              <CardContent className="grid gap-6">
+                <p className="text-sm font-medium text-center">
+                  업로드 후 AI가 설명을 작성합니다
+                </p>
+                <p className="text-xs text-muted-foreground text-center mt-1">
+                  영상의 핵심 내용을 분석하여
+                  <br />
+                  가장 적절한 소개글을 자동으로 생성할게요.
+                </p>
+              </CardContent>
+            </Card>
+          </TabsContent>
+          <TabsContent value="manual">
+            <Textarea
+              maxLength={10000}
+              value={content}
+              onChange={(e) => setContent(e.target.value)}
+              className="max-w-md w-full h-50"
+              placeholder="영상에 대한 설명을 입력하세요."
+            />
+            <GuideDialog />
+          </TabsContent>
+        </Tabs>
+      </div>
 
       <Button
         disabled={!video || isLoading || isSubmitting} // 제출 중에도 버튼 비활성화
