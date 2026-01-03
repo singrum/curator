@@ -8,23 +8,26 @@ import remarkGfm from "remark-gfm";
 import remarkMath from "remark-math";
 
 import { cn } from "@/lib/utils";
-import "highlight.js/styles/github-dark.css";
+import "highlight.js/styles/github-dark.css"; // 하이라이트 스타일
 import "katex/dist/katex.min.css";
 
 export default function MarkdownContent({ children }: { children: string }) {
   return (
     <div
       className={cn(
-        "prose max-w-none dark:prose-invert text-foreground",
+        "prose max-w-none text-foreground dark:prose-invert",
 
-        "prose-ul:list-disc prose-ol:leading-6 prose-ul:leading-6 prose-li:leading-6",
+        // "[--tw-prose-pre-bg:var(--secondary)]", // 코드 블록 배경을 secondary 컬러로
+        // "[--tw-prose-pre-code:var(--foreground)]", // 코드 내부 텍스트 컬러
+        // "prose-pre:rounded-xl prose-pre:border prose-pre:border-border", // 둥근 모서리와 테두리
         "[--tw-prose-bullets:var(--foreground)]",
-        "[&_ul_ul]:my-0",
-        "[&_ol_ol]:my-0",
-        "[&_ul_ol]:my-0",
-        "[&_ol_ul]:my-0",
+        // 2. 인라인 코드 스타일 (문장 중간에 있는 `code`)
+        "prose-code:before:content-none prose-code:after:content-none", // 따옴표 제거
+        "prose-code:bg-muted prose-code:px-1.5 prose-code:py-0.5 prose-code:rounded-md prose-code:font-medium",
 
-        "prose-headings:font-bold prose-headings:tracking-tight"
+        "prose-ul:list-inside",
+        "prose-li:my-1 prose-ul:my-1 prose-ol:my-1",
+        "prose-p:my-1"
       )}
     >
       <ReactMarkdown

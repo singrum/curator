@@ -66,8 +66,8 @@ export default function GuideDialog() {
   return (
     <Dialog>
       <DialogTrigger asChild>
-        <Button variant="link" className="px-0 text-indigo-500">
-          <span className="text-sm font-semibold">AI 자동 작성 가이드</span>
+        <Button variant="link" className="px-0 ">
+          <span className="text-sm ">AI 자동 작성 가이드</span>
         </Button>
       </DialogTrigger>
 

@@ -1,4 +1,5 @@
 // src/videos/entities/video.entity.ts
+import { Comment } from 'src/comments/entities/comment.entity';
 import { Topic } from 'src/topics/entities/topic.entity';
 import { User } from 'src/users/user.entity';
 import {
@@ -9,7 +10,9 @@ import {
   JoinTable,
   ManyToMany,
   ManyToOne,
+  OneToMany,
   PrimaryGeneratedColumn,
+  VirtualColumn,
 } from 'typeorm';
 
 @Entity()
@@ -39,6 +42,9 @@ export class Video {
   @JoinColumn({ name: 'submitter_id' })
   submitter: User;
 
+  @OneToMany(() => Comment, (comment) => comment.video)
+  comments: Comment[];
+
   @ManyToMany(() => Topic, (topic) => topic.videos, {
     cascade: true,
   })
@@ -48,4 +54,10 @@ export class Video {
     inverseJoinColumn: { name: 'topic_id', referencedColumnName: 'id' },
   })
   topics: Topic[];
+
+  @VirtualColumn({
+    query: (alias) =>
+      `SELECT COUNT("id") FROM "comment" WHERE "videoId" = ${alias}.id`,
+  })
+  commentCount?: number;
 }

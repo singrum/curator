@@ -1,3 +1,4 @@
+import { Comment } from 'src/comments/entities/comment.entity';
 import { Video } from 'src/videos/entities/video.entity';
 import {
   Column,
@@ -35,4 +36,7 @@ export class User {
   // 추가된 관계: 한 명의 유저는 여러 개의 게시글을 가질 수 있음
   @OneToMany(() => Video, (video) => video.submitter)
   videos: Video[];
+
+  @OneToMany(() => Comment, (comment) => comment.author)
+  comments: Comment[];
 }

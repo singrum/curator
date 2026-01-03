@@ -10,7 +10,6 @@ import { User } from 'src/users/user.entity';
 import strip from 'strip-markdown';
 import { Repository } from 'typeorm';
 import { CreateVideoDto } from './dto/create-video.dto';
-import { UpdateVideoDto } from './dto/update-video.dto';
 import { Video } from './entities/video.entity';
 import { YoutubeOEmbed } from './types/youtube';
 @Injectable()
@@ -55,13 +54,7 @@ export class VideosService {
       throw error;
     }
   }
-  private removeMarkdown(content: string): string {
-    return content
-      .replace(/[#*`~_]/g, '') // 주요 특수문자 제거
-      .replace(/\[(.*?)\]\(.*?\)/g, '$1') // 링크 텍스트만 남김
-      .replace(/\n+/g, ' ') // 줄바꿈을 공백으로 변경
-      .trim();
-  }
+
   async findAll(page: number = 1, limit: number = 10) {
     const skip = (page - 1) * limit;
 
@@ -69,6 +62,7 @@ export class VideosService {
       .createQueryBuilder('video')
       .leftJoinAndSelect('video.submitter', 'submitter')
       .leftJoinAndSelect('video.topics', 'topics')
+      .loadRelationCountAndMap('video.commentCount', 'video.comments')
       .select([
         'video.id',
         'video.videoId',
@@ -112,7 +106,6 @@ export class VideosService {
         };
       }),
     );
-    console.log(items);
 
     return {
       items,
@@ -123,38 +116,47 @@ export class VideosService {
       },
     };
   }
-  async findOne(id: number) {
-    const video = await this.videoRepository.findOne({
-      where: { id },
-      relations: ['submitter', 'topics'],
-      select: {
-        id: true,
-        videoId: true,
-        title: true,
-        authorName: true,
-        createdAt: true,
-        score: true,
-        content: true,
-        topics: {
-          id: true,
-          name: true,
-        },
-        submitter: {
-          id: true,
-          nickname: true,
-        },
-      },
-    });
+  // src/videos/videos.service.ts
 
-    if (!video) {
-      throw new NotFoundException(`Video with ID ${id} not found`);
-    }
+  async findOne(id: number) {
+    const queryBuilder = this.videoRepository
+      .createQueryBuilder('video')
+      .leftJoinAndSelect('video.submitter', 'submitter')
+      .leftJoinAndSelect('video.topics', 'topics')
+      // 1. 댓글 목록과 댓글 작성자를 함께 가져오기 위해 조인 추가
+      .leftJoinAndSelect('video.comments', 'comments')
+      .leftJoinAndSelect('comments.author', 'author')
+      // 2. 댓글 개수는 기존처럼 유지 (필요하다면)
+      .loadRelationCountAndMap('video.commentCount', 'video.comments')
+      .where('video.id = :id', { id })
+      .select([
+        'video.id',
+        'video.videoId',
+        'video.title',
+        'video.authorName',
+        'video.content',
+        'video.createdAt',
+        'video.score',
+        'submitter.id',
+        'submitter.nickname',
+        'topics.id',
+        'topics.name',
+        // 3. 반환할 댓글 필드들 선택 (보안을 위해 필요한 것만)
+        'comments.id',
+        'comments.content',
+        'comments.createdAt',
+        'author.id',
+        'author.nickname',
+        'author.avatarUrl',
+      ])
+      // 4. 댓글을 최신순으로 정렬
+      .orderBy('comments.createdAt', 'ASC');
+
+    const video = await queryBuilder.getOne();
+
+    if (!video) throw new NotFoundException('영상을 찾을 수 없습니다.');
 
     return video;
-  }
-
-  update(id: number, updateVideoDto: UpdateVideoDto) {
-    return `This action updates a #${id} video`;
   }
 
   remove(id: number) {

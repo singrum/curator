@@ -2,6 +2,7 @@
 "use server";
 
 import { isAxiosError } from "axios";
+import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 import { Video, VideoPaginationResponse } from "../types";
 import { getUser } from "./auth";
@@ -69,5 +70,50 @@ export async function getVideoDetail(videoId: string): Promise<Video | null> {
   } catch (error) {
     console.error("Fetch Video Detail Error:", error);
     return null;
+  }
+}
+
+export async function createComment(videoId: number, content: string) {
+  const user = await getUser();
+  if (!user) return { error: "로그인이 필요합니다." };
+
+  if (!content || content.trim().length === 0) {
+    return { error: "댓글 내용을 입력해주세요." };
+  }
+
+  try {
+    // 백엔드 엔드포인트: POST /comments/:videoId
+    await api.post(`/comments/${videoId}`, { content });
+
+    // 💡 댓글 작성 후 해당 영상 상세 페이지의 캐시를 새로고침하여 즉시 반영
+    revalidatePath(`/video/${videoId}`);
+
+    return { success: true };
+  } catch (error) {
+    if (isAxiosError(error)) {
+      const serverMessage = error.response?.data?.message;
+      const errorMessage = Array.isArray(serverMessage)
+        ? serverMessage[0]
+        : serverMessage;
+
+      return {
+        error: errorMessage || "댓글 등록에 실패했습니다.",
+      };
+    }
+
+    return { error: "알 수 없는 오류가 발생했습니다." };
+  }
+}
+
+/**
+ * 댓글 삭제 함수 (추가 권장)
+ */
+export async function deleteComment(commentId: number, videoId: number) {
+  try {
+    await api.delete(`/comments/${commentId}`);
+    revalidatePath(`/video/${videoId}`);
+    return { success: true };
+  } catch (error) {
+    return { error: "댓글 삭제 중 오류가 발생했습니다." };
   }
 }

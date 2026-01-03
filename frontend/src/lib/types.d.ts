@@ -18,19 +18,26 @@ export interface Topic {
   id: number;
   name: string; // 토픽 이름
 }
-
+export interface Comment {
+  id: number;
+  content: string;
+  createdAt: string;
+  updatedAt: string;
+  author: User;
+}
 export interface Video {
   id: number;
-  createdAt: string; // 서버에서 올 때 보통 ISOString 날짜 문자열로 옴
-  videoId: string; // 유튜브 고유 ID (예: dQw4w9WgXcQ)
+  createdAt: string;
+  videoId: string;
   title: string;
   authorName: string;
   content: string | null;
   score: number;
 
-  // 관계형 데이터 (Join 정보)
   submitter: { nickname: string; id: number };
   topics: Topic[];
+  comments: Comment[];
+  commentCount: number;
 }
 
 // 페이지네이션 응답 구조 (findAll API 결과용)

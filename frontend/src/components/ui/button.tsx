@@ -17,10 +17,10 @@ const buttonVariants = cva(
         secondary:
           "bg-secondary text-secondary-foreground hover:bg-secondary/80 border",
         ghost: "hover:text-accent-foreground dark:hover:bg-accent/50",
-        link: "text-[#1D4ED8] underline-offset-4 underline underline-offset-1 hover:no-underline",
+        link: "text-[#1D4ED8] underline-offset-4 underline underline-offset-1Z",
       },
       size: {
-        default: "h-9 px-2 py-1 has-[>svg]:px-2 rounded-xs",
+        default: "h-8 px-2 py-1 has-[>svg]:px-2 rounded-xs",
         sm: "h-8 rounded-xs gap-1.5 px-3 has-[>svg]:px-2.5",
         lg: "h-10 rounded-xs px-6 has-[>svg]:px-4",
         icon: "size-9",

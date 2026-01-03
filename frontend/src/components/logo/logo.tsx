@@ -5,5 +5,11 @@ const jetbrainsMono = JetBrains_Mono({
 });
 
 export default function Logo() {
-  return <div className={`text-2xl ${jetbrainsMono.className}`}>curator</div>;
+  return (
+    <div
+      className={`text-xl font-bold tracking-tighter ${jetbrainsMono.className}`}
+    >
+      curator
+    </div>
+  );
 }

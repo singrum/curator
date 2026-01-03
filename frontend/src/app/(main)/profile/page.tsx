@@ -7,7 +7,7 @@ import RoleForm from "./_component/role-form";
 export default async function Page() {
   const user = await getUser();
   if (!user) {
-    redirect("/");
+    redirect("/login");
   }
   return (
     <div>

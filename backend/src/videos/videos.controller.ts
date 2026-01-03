@@ -5,7 +5,6 @@ import {
   Delete,
   Get,
   Param,
-  Patch,
   Post,
   Query,
   Req,
@@ -15,7 +14,6 @@ import type { RequestWithUser } from 'src/auth/guards/jwt-auth.guard';
 import { UserRole } from 'src/common/constants/role';
 import { User } from 'src/users/user.entity';
 import { CreateVideoDto } from './dto/create-video.dto';
-import { UpdateVideoDto } from './dto/update-video.dto';
 import { VideosService } from './videos.service';
 
 @Controller('videos')
@@ -47,11 +45,6 @@ export class VideosController {
   @Get(':id')
   findOne(@Param('id') id: string) {
     return this.videosService.findOne(+id);
-  }
-
-  @Patch(':id')
-  update(@Param('id') id: string, @Body() updateVideoDto: UpdateVideoDto) {
-    return this.videosService.update(+id, updateVideoDto);
   }
 
   @Delete(':id')

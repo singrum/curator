@@ -14,10 +14,9 @@ export interface RequestWithUser extends Request {
   cookies: {
     jwt?: string;
     refresh_token?: string;
-    [key: string]: string | undefined; // 다른 쿠키들도 허용하되 타입을 string으로 제한
   };
-  user: { id: number };
-} // src/auth/guards/jwt-auth.guard.ts
+  user: { id: number; role: number }; // role 타입 추가
+}
 
 @Injectable()
 export class JwtAuthGuard implements CanActivate {
@@ -33,32 +32,28 @@ export class JwtAuthGuard implements CanActivate {
     const accessToken = req.cookies?.['jwt'];
     const refreshToken = req.cookies?.['refresh_token'];
 
-    // 1. 우선 액세스 토큰이 있다면 검증을 시도합니다.
     if (accessToken) {
       try {
-        const payload = this.jwtService.verify<{ userId: number }>(accessToken);
-        req.user = { id: payload.userId };
-        return true; // 검증 성공 시 즉시 통과
+        // 1. 토큰 생성 시점에 role을 넣었다면 여기서 바로 꺼낼 수 있습니다.
+        const payload = this.jwtService.verify<{
+          userId: number;
+          role: number;
+        }>(accessToken);
+        req.user = { id: payload.userId, role: payload.role };
+        return true;
       } catch {
-        // 검증 실패(만료 등) 시 에러를 던지지 않고 아래 리프레시 로직으로 흐르게 합니다.
-        console.log(
-          'Access token invalid or expired, checking refresh token...',
-        );
+        console.log('Access token expired, checking refresh...');
       }
     }
 
-    // 2. 액세스 토큰이 없거나 검증에 실패한 경우 리프레시 토큰을 확인합니다.
-    if (!refreshToken) {
-      // 둘 다 없으면 비로소 401 에러를 던집니다.
-      throw new UnauthorizedException('Authentication failed');
-    }
+    if (!refreshToken) throw new UnauthorizedException('Authentication failed');
 
     try {
-      // 리프레시 토큰으로 새 액세스 토큰 발급
+      // 2. 리프레시 시에는 어차피 DB를 거치는 경우가 많으므로,
+      // authService.refreshToken이 유저의 최신 role 정보를 포함한 user 객체를 주도록 합니다.
       const { accessToken: newAccessToken, user } =
         await this.authService.refreshToken(refreshToken);
 
-      // 브라우저 쿠키 업데이트
       res.cookie('jwt', newAccessToken, {
         httpOnly: true,
         secure: process.env.NODE_ENV === 'production',
@@ -66,11 +61,9 @@ export class JwtAuthGuard implements CanActivate {
         path: '/',
       });
 
-      // 새로운 유저 정보 세팅
-      req.user = { id: user.id };
+      req.user = { id: user.id, role: user.role }; // 갱신된 정보 주입
       return true;
     } catch {
-      // 리프레시 토큰마저 유효하지 않은 경우
       throw new UnauthorizedException('Session expired');
     }
   }

@@ -6,6 +6,7 @@ import { OAuthModule } from './oauth/oauth.module';
 import { TopicsModule } from './topics/topics.module';
 import { UsersModule } from './users/users.module';
 import { VideosModule } from './videos/videos.module';
+import { CommentsModule } from './comments/comments.module';
 
 @Module({
   imports: [
@@ -24,6 +25,7 @@ import { VideosModule } from './videos/videos.module';
     OAuthModule,
     TopicsModule,
     VideosModule,
+    CommentsModule,
   ],
 })
 export class AppModule {}

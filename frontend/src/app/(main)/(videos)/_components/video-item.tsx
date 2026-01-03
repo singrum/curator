@@ -12,7 +12,7 @@ import { Video } from "@/lib/types";
 
 export default function VideoItem({ data }: { data: Video }) {
   return (
-    <Item key={data.id} className="p-0 flex-nowrap items-stretch group">
+    <Item key={data.id} className="p-0 flex-nowrap items-stretch">
       <a
         href={`https://www.youtube.com/watch?v=${data.videoId}`}
         target="_blank"
@@ -32,11 +32,16 @@ export default function VideoItem({ data }: { data: Video }) {
       <ItemContent className="flex flex-col justify-between">
         <div className="flex">
           <Link href={`/video/${data.id}`} className="space-y-1">
-            <ItemHeader className="break-all max-w-full overflow-hidden text-ellipsis font-semibold text-link underline-offset-2 underline group-hover:no-underline">
+            <ItemHeader className="break-all max-w-full overflow-hidden text-ellipsis font-semibold text-link ">
               {data.title}
             </ItemHeader>
             <ItemDescription className="break-all text-foreground">
               {data.content}
+            </ItemDescription>
+
+            <ItemDescription className="text-sm text-muted-foreground">
+              {new Date(data.createdAt).toLocaleTimeString()} | 댓글{" "}
+              {data.commentCount}개
             </ItemDescription>
           </Link>
         </div>
