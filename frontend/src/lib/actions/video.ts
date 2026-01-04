@@ -8,49 +8,63 @@ import { Video, VideoPaginationResponse } from "../types";
 import { getUser } from "./auth";
 import { api } from "./axios";
 
-export async function createVideo(videoId: string, content: string) {
+/**
+ * 비디오 등록 함수
+ * @param videoId 유튜브 고유 ID
+ * @param content 아티클 본문 (마크다운)
+ * @param articleTitle AI가 생성한 아티클 제목
+ * @param tags AI가 추출한 태그 배열
+ */
+export async function createVideo(
+  videoId: string,
+  content: string,
+  articleTitle: string,
+  topics: string[]
+) {
   const user = await getUser();
-  if (!user) throw new Error("로그인이 필요합니다.");
+  if (!user) return { error: "로그인이 필요합니다." };
 
-  let success = false;
+  // 1. 기본 검증 (서버 전송 전)
+  if (!videoId || videoId.length !== 11) {
+    return { error: "유효한 유튜브 비디오 ID를 입력해주세요." };
+  }
+  if (!articleTitle) {
+    return { error: "아티클 제목은 필수입니다." };
+  }
 
   try {
-    await api.post("/videos", { videoId, content });
-    success = true;
+    // 2. 백엔드 API 호출 (업데이트된 DTO 구조에 맞춤)
+    await api.post("/videos", {
+      videoId,
+      content,
+      articleTitle,
+      topics,
+    });
+
+    // 💡 목록 페이지 및 태그 관련 캐시 갱신
+    revalidatePath("/");
   } catch (error) {
-    // 1. Axios 에러인지 확인 (any 제거)
     if (isAxiosError(error)) {
       const serverMessage = error.response?.data?.message;
-
-      // NestJS의 ValidationPipe 에러(배열)와 일반 에러(문자열) 모두 대응
       const errorMessage = Array.isArray(serverMessage)
         ? serverMessage[0]
         : serverMessage;
-
-      console.error(error.response?.data || error.message);
 
       return {
         error: errorMessage || "비디오 등록에 실패했습니다.",
       };
     }
-
-    // 2. Axios 에러가 아닌 일반 에러 처리
-    console.error("Unknown Error:", error);
-    return {
-      error: "알 수 없는 오류가 발생했습니다.",
-    };
+    return { error: "알 수 없는 오류가 발생했습니다." };
   }
 
-  // 성공 시 리다이렉트 (try-catch 외부에서 실행)
-  if (success) {
-    if (content.length === 0) {
-      redirect("/submit/success");
-    } else {
-      redirect("/");
-    }
+  // 3. 성공 시 리다이렉트 (try-catch 외부에서 실행)
+  // content가 없거나 AI 생성을 거치지 않은 경우와 구분하여 이동
+  if (content.trim().length === 0) {
+    redirect("/submit/success");
+  } else {
+    redirect("/");
   }
 }
-
 export async function getVideos(
   page: number = 1
 ): Promise<VideoPaginationResponse> {

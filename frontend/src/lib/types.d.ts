@@ -30,7 +30,9 @@ export interface Video {
   createdAt: string;
   videoId: string;
   title: string;
+  articleTitle: string;
   authorName: string;
+  authorUrl: string;
   content: string | null;
   score: number;
 

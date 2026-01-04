@@ -33,15 +33,19 @@ export default function VideoItem({ data }: { data: Video }) {
         <div className="flex">
           <Link href={`/video/${data.id}`} className="space-y-1">
             <ItemHeader className="break-all max-w-full overflow-hidden text-ellipsis font-semibold text-link ">
-              {data.title}
+              {data.articleTitle}
             </ItemHeader>
             <ItemDescription className="break-all text-foreground">
               {data.content}
             </ItemDescription>
 
             <ItemDescription className="text-xs text-muted-foreground">
-              {new Date(data.createdAt).toLocaleTimeString()} | 댓글{" "}
-              {data.commentCount}개
+              {new Date(data.createdAt).toLocaleString("ko-KR", {
+                dateStyle: "medium",
+                timeStyle: "short",
+                hour12: false,
+              })}{" "}
+              | 댓글 {data.commentCount}개
             </ItemDescription>
           </Link>
         </div>

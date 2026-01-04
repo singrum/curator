@@ -9,6 +9,8 @@ import { remark } from 'remark';
 import { User } from 'src/users/user.entity';
 import strip from 'strip-markdown';
 import { Repository } from 'typeorm';
+
+import { Topic } from 'src/topics/entities/topic.entity';
 import { CreateVideoDto } from './dto/create-video.dto';
 import { Video } from './entities/video.entity';
 import { YoutubeOEmbed } from './types/youtube';
@@ -17,9 +19,17 @@ export class VideosService {
   constructor(
     @InjectRepository(Video)
     private readonly videoRepository: Repository<Video>,
+    @InjectRepository(Topic)
+    private readonly topicRepository: Repository<Topic>,
   ) {}
   async createVideo(createVideoDto: CreateVideoDto, user: User) {
-    const { videoId, content } = createVideoDto;
+    console.log(createVideoDto);
+    const {
+      videoId,
+      content,
+      articleTitle,
+      topics: topicsArr,
+    } = createVideoDto;
 
     // 1. 이미 등록된 비디오인지 확인
     const existingVideo = await this.videoRepository.findOne({
@@ -36,28 +46,43 @@ export class VideosService {
         `https://www.youtube.com/oembed?url=https://www.youtube.com/watch?v=${videoId}&format=json`,
       );
 
-      // 3. 비디오 생성 및 저장
+      const topics: Topic[] = await Promise.all(
+        topicsArr.map(async (name): Promise<Topic> => {
+          // 이미 존재하는 태그인지 확인
+          let topic = await this.topicRepository.findOne({ where: { name } });
+          if (!topic) {
+            // 없으면 새로 생성
+            topic = this.topicRepository.create({ name });
+            await this.topicRepository.save(topic);
+          }
+          return topic;
+        }),
+      );
+
+      // 4. 비디오 생성 및 저장
       const newVideo = this.videoRepository.create({
         videoId,
-        title: data.title,
+        title: data.title, // 입력된 제목이 없으면 유튜브 제목 사용
         authorName: data.author_name,
+        authorUrl: data.author_url,
+        articleTitle: articleTitle,
         content: content,
         submitter: user,
+        topics: topics, // 처리된 태그 배열 연결
       });
-
+      console.log(newVideo);
       return await this.videoRepository.save(newVideo);
     } catch (error) {
-      // 유튜브 API 호출 실패 시 에러 처리 (예: 잘못된 videoId)
       if (axios.isAxiosError(error) && error.response?.status === 404) {
         throw new NotFoundException('유효하지 않은 유튜브 비디오 ID입니다.');
       }
       throw error;
     }
   }
-
   async findAll(page: number = 1, limit: number = 10) {
     const skip = (page - 1) * limit;
 
+    // 1. 먼저 비디오 목록의 ID들을 가져옵니다 (페이징 보장)
     const queryBuilder = this.videoRepository
       .createQueryBuilder('video')
       .leftJoinAndSelect('video.submitter', 'submitter')
@@ -67,6 +92,7 @@ export class VideosService {
         'video.id',
         'video.videoId',
         'video.title',
+        'video.articleTitle',
         'video.authorName',
         'video.createdAt',
         'video.score',
@@ -75,7 +101,7 @@ export class VideosService {
         'topics.id',
         'topics.name',
       ])
-      // 마크다운 기호가 포함된 상태로 자르면 문법이 깨질 수 있으므로 충분히 가져옴 (500자)
+      // 💡 RAW 데이터 매핑 오류를 해결하기 위해 SUBSTRING 결과를 별칭으로 확실히 관리
       .addSelect('SUBSTRING(video.content, 1, 500)', 'video_content')
       .orderBy('video.createdAt', 'DESC')
       .take(limit)
@@ -84,19 +110,30 @@ export class VideosService {
     const { entities, raw } = await queryBuilder.getRawAndEntities();
     const total = await queryBuilder.getCount();
 
-    const typedRaw = raw as Array<{ video_content: string }>;
+    // 💡 [해결] raw 데이터에서 각 비디오 ID에 맞는 content를 Map에 저장
+    const contentMap = new Map();
+    raw.forEach(
+      (row: {
+        video_content?: string;
+        video_video_content?: string;
+        video_id?: number;
+      }) => {
+        const content = row.video_content || row.video_video_content;
+        const videoId = row.video_id;
+        if (videoId && !contentMap.has(videoId)) {
+          contentMap.set(videoId, content);
+        }
+      },
+    );
 
-    // 1. 비동기 마크다운 제거 처리를 위해 Promise.all 사용
     const items = await Promise.all(
-      entities.map(async (entity, index) => {
-        const rawMarkdown = typedRaw[index].video_content || '';
+      entities.map(async (entity) => {
+        // 💡 인덱스가 아닌 엔티티 ID로 정확한 content를 찾아옴
+        const rawMarkdown: string = (contentMap.get(entity.id) as string) || '';
 
-        // 2. remark를 사용하여 마크다운 태그 제거
         const processed = await remark().use(strip).process(rawMarkdown);
-
-        // 3. 텍스트로 변환 후 줄바꿈 정리 및 최종 글자수 제한 (예: 150자)
         const plainText = String(processed)
-          .replace(/\n+/g, ' ') // 줄바꿈을 공백으로 치환
+          .replace(/\n+/g, ' ')
           .trim()
           .slice(0, 150);
 
@@ -107,14 +144,7 @@ export class VideosService {
       }),
     );
 
-    return {
-      items,
-      meta: {
-        total,
-        page,
-        lastPage: Math.ceil(total / limit),
-      },
-    };
+    return { items, meta: { total, page, lastPage: Math.ceil(total / limit) } };
   }
   // src/videos/videos.service.ts
 
@@ -133,7 +163,9 @@ export class VideosService {
         'video.id',
         'video.videoId',
         'video.title',
+        'video.articleTitle',
         'video.authorName',
+        'video.authorUrl',
         'video.content',
         'video.createdAt',
         'video.score',

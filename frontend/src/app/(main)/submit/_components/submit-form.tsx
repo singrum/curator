@@ -3,29 +3,54 @@
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Spinner } from "@/components/ui/spinner";
 import { Textarea } from "@/components/ui/textarea";
 import { createVideo } from "@/lib/actions/video";
+import { prompts } from "@/lib/prompts";
 import { YoutubeOEmbed } from "@/lib/types";
 import { cn } from "@/lib/utils";
 import { getVideoById, getVideoId } from "@/lib/youtube";
+import { ExternalLink } from "lucide-react"; // 아이콘 추가
 import Image from "next/image";
 import { useEffect, useState } from "react";
 import { toast } from "sonner";
-import GuideDialog from "./guide-dialog";
+
 export default function SubmitForm() {
   const [url, setUrl] = useState("");
   const [video, setVideo] = useState<YoutubeOEmbed | null>(null);
   const [isLoading, setIsLoading] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
+
+  const [articleTitle, setArticleTitle] = useState("");
   const [content, setContent] = useState("");
+  const [tagsInput, setTagsInput] = useState("");
+
+  const videoId = getVideoId(url);
+  const isInvalidUrl = url.length > 0 && !videoId;
+
+  // 프롬프트 생성 로직
+
+  const handleCopy = async (text: string) => {
+    await navigator.clipboard.writeText(text);
+    toast.success("프롬프트가 복사되었습니다.");
+  };
 
   const handleSubmit = async () => {
     if (!videoId) return;
-
+    if (!articleTitle.trim()) {
+      toast.error("아티클 제목을 입력해주세요.");
+      return;
+    }
     setIsSubmitting(true);
-
-    const result = await createVideo(videoId, content);
+    const topicsArray = tagsInput
+      .split(",")
+      .map((t) => t.trim())
+      .filter((t) => t !== "");
+    const result = await createVideo(
+      videoId,
+      content,
+      articleTitle,
+      topicsArray
+    );
 
     if (result?.error) {
       toast.error(result.error);
@@ -35,121 +60,155 @@ export default function SubmitForm() {
 
     setUrl("");
     setVideo(null);
+    setArticleTitle("");
+    setContent("");
+    setTagsInput("");
     setIsSubmitting(false);
+    toast.success("비디오가 성공적으로 등록되었습니다.");
   };
-  // 1. 파생 상태: 렌더링 도중 계산 (setState 필요 없음)
-  const videoId = getVideoId(url);
-  const isInvalidUrl = url.length > 0 && !videoId;
 
-  // 2. 입력값이 바뀔 때 비디오 정보 즉시 초기화 (Effect 밖에서 처리)
   const handleUrlChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const newUrl = e.target.value;
     setUrl(newUrl);
-
-    // 새 URL이 유효하지 않거나 비어있으면 즉시 비디오 상태 초기화
-    if (!getVideoId(newUrl)) {
-      setVideo(null);
-    }
+    if (!getVideoId(newUrl)) setVideo(null);
   };
 
   useEffect(() => {
-    // ID가 없으면 아무것도 하지 않음 (이미 위에서 초기화됨)
     if (!videoId) return;
-
     let isIgnore = false;
-
     async function fetchVideo() {
-      // 3. 비동기 작업 시작 직전에만 로딩 상태 설정
       setIsLoading(true);
       try {
         const data = await getVideoById(videoId!);
-        if (!isIgnore) {
-          setVideo(data);
-        }
+        if (!isIgnore) setVideo(data);
       } catch {
         if (!isIgnore) setVideo(null);
       } finally {
         if (!isIgnore) setIsLoading(false);
       }
     }
-
     fetchVideo();
-
     return () => {
       isIgnore = true;
     };
-  }, [videoId]); // videoId가 변할 때만 API 호출
+  }, [videoId]);
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-6 pb-10">
       <div className="space-y-2">
         <Label htmlFor="youtube-url">유튜브 영상 URL</Label>
-        <Input
-          id="youtube-url"
-          placeholder="https://www.youtube.com/watch?v=..."
-          value={url}
-          onChange={handleUrlChange}
-          className={cn("max-w-md ", {
-            "border-destructive focus-visible:ring-destructive": isInvalidUrl,
-          })}
-        />
+        <div className="flex gap-2">
+          <Input
+            id="youtube-url"
+            placeholder="https://www.youtube.com/watch?v=..."
+            value={url}
+            onChange={handleUrlChange}
+            className={cn("max-w-md", { "border-destructive": isInvalidUrl })}
+          />
+        </div>
         {isInvalidUrl && (
           <p className="text-destructive text-sm font-medium">
-            유효한 유튜브 영상 주소를 입력해주세요.
+            유효한 주소를 입력해주세요.
           </p>
         )}
       </div>
+
       {video && (
-        <div
-          className={cn(
-            "max-w-md w-full rounded-xs bg-muted p-4 flex flex-col items-center justify-center"
-          )}
-        >
-          <div className="w-full space-y-4">
-            <div className="relative aspect-video w-full overflow-hidden rounded-md">
-              <Image
-                src={video.thumbnail_url}
-                alt={video.title}
-                fill
-                className="object-cover"
-                unoptimized
-              />
-            </div>
-            <div className="space-y-1">
-              <h3 className="font-bold leading-tight">{video.title}</h3>
-              <p className="text-sm text-muted-foreground">
-                {video.author_name}
-              </p>
-            </div>
+        <div className="max-w-md w-full rounded-xs border bg-muted/50 p-4 flex flex-col gap-4">
+          <div className="relative aspect-video w-full overflow-hidden rounded-md border bg-black">
+            <Image
+              src={video.thumbnail_url}
+              alt={video.title}
+              fill
+              className="object-cover"
+              unoptimized
+            />
+          </div>
+          <div className="space-y-1">
+            <h3 className="font-bold text-sm line-clamp-2">{video.title}</h3>
+            <p className="text-xs text-muted-foreground">{video.author_name}</p>
           </div>
         </div>
       )}
-      <div className="space-y-2">
-        <div className="text-sm font-medium">설명</div>
+      <Button
+        variant="outline"
+        className="max-w-md w-full"
+        onClick={() =>
+          window.open("https://gemini.google.com/app?hl=ko", "_blank")
+        }
+      >
+        Gemini 열기 <ExternalLink className="ml-2 h-4 w-4" />
+      </Button>
+      <div className="space-y-8 max-w-md w-full">
+        {/* 본문 입력 + 프롬프트 복사 */}
+        <div className="space-y-2">
+          <Label htmlFor="content">본문</Label>
+          <Textarea
+            id="content"
+            value={content}
+            onChange={(e) => setContent(e.target.value)}
+            className="h-60 resize-none font-mono text-sm"
+            placeholder="AI Studio에서 복사한 마크다운 내용을 붙여넣으세요."
+          />
+          <Button
+            size="sm"
+            variant="secondary"
+            disabled={!videoId}
+            onClick={() => videoId && handleCopy(prompts.article(videoId))}
+            className="font-normal"
+          >
+            프롬프트 복사
+          </Button>
+        </div>
 
-        <Textarea
-          maxLength={10000}
-          value={content}
-          onChange={(e) => setContent(e.target.value)}
-          className="max-w-md w-full h-50"
-          placeholder="영상에 대한 설명을 입력하세요."
-        />
-        <GuideDialog />
+        {/* 제목 입력 + 프롬프트 복사 */}
+        <div className="space-y-2">
+          <Label htmlFor="article-title">제목</Label>
+          <Input
+            id="article-title"
+            placeholder="AI가 생성한 제목을 입력하세요."
+            value={articleTitle}
+            onChange={(e) => setArticleTitle(e.target.value)}
+          />
+          <Button
+            size="sm"
+            variant="secondary"
+            disabled={!video}
+            onClick={() => video && handleCopy(prompts.title(video.title))}
+            className="font-normal"
+          >
+            프롬프트 복사
+          </Button>
+        </div>
+
+        {/* 태그 입력 + 프롬프트 복사 */}
+        <div className="space-y-2">
+          <Label htmlFor="topics">토픽 (쉼표로 구분)</Label>
+          <Input
+            id="topics"
+            placeholder="심리학,뇌과학,자기계발"
+            value={tagsInput}
+            onChange={(e) => setTagsInput(e.target.value)}
+          />
+          <Button
+            size="sm"
+            variant="secondary"
+            disabled={!videoId}
+            onClick={() => handleCopy(prompts.tag)}
+            className="font-normal"
+          >
+            프롬프트 복사
+          </Button>
+        </div>
       </div>
 
       <Button
+        className="w-full max-w-md"
         variant="secondary"
-        disabled={!video || isLoading || isSubmitting} // 제출 중에도 버튼 비활성화
+        disabled={!video || isLoading || isSubmitting || !articleTitle}
         onClick={handleSubmit}
       >
-        {isSubmitting ? (
-          <>
-            <Spinner />
-            {"제출 중"}
-          </>
-        ) : (
-          "제출"
-        )}
+        {isSubmitting ? "등록 중..." : "제출하기"}
       </Button>
     </div>
   );

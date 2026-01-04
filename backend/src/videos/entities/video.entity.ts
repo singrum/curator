@@ -24,16 +24,22 @@ export class Video {
   createdAt: Date;
 
   @Column({ unique: true })
-  videoId: string; // 유튜브 고유 ID
+  videoId: string;
 
   @Column()
-  title: string; // 영상 제목
+  title: string;
+
+  @Column({ default: '' })
+  articleTitle: string;
 
   @Column()
-  authorName: string; // 💡 유튜브 채널명 (단순 문자열 저장)
+  authorName: string;
+
+  @Column({ default: '' })
+  authorUrl: string;
 
   @Column({ type: 'text', nullable: true })
-  content: string; // 유저가 작성한 추가 설명 등
+  content: string;
 
   @Column({ default: 0 })
   score: number;
