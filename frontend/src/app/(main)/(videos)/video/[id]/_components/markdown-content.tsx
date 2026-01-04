@@ -14,7 +14,7 @@ export default function MarkdownContent({ children }: { children: string }) {
   return (
     <div
       className={cn(
-        "prose max-w-none text-foreground dark:prose-invert",
+        "prose max-w-none text-foreground dark:prose-invert prose-sm sm:prose-base",
 
         // 1단계: 기본 불릿 (disc)
         "prose-ul:list-disc",

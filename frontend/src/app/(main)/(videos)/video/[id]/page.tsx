@@ -1,4 +1,3 @@
-import { Separator } from "@/components/ui/separator";
 import { getVideoDetail } from "@/lib/actions/video";
 import { IdtoUrl } from "@/lib/youtube";
 import CommentForm from "./_components/comment-form";
@@ -17,9 +16,9 @@ export default async function Page({
   }
 
   return (
-    <div className="space-y-2">
+    <div className="space-y-2 wrap-break-word">
       <h1 className="text-2xl font-bold">{video.articleTitle}</h1>
-      <p className="font-medium">
+      <p className="font-medium text-xs mb-8">
         <a
           href={IdtoUrl(video.videoId)}
           target="_blank"
@@ -38,7 +37,7 @@ export default async function Page({
           {video.authorName}
         </a>
       </p>
-      <Separator className="my-4" />
+
       <MarkdownContent>{video.content || ""}</MarkdownContent>
       <div className="aspect-video w-full overflow-hidden rounded-xs my-6">
         <iframe
