@@ -17,6 +17,7 @@ export interface YoutubeOEmbed {
 export interface Topic {
   id: number;
   name: string; // 토픽 이름
+  videoCount?: number;
 }
 export interface Comment {
   id: number;
@@ -34,20 +35,19 @@ export interface Video {
   authorName: string;
   authorUrl: string;
   content: string | null;
-  score: number;
-
-  submitter: { nickname: string; id: number };
   topics: Topic[];
   comments: Comment[];
   commentCount: number;
 }
 
-// 페이지네이션 응답 구조 (findAll API 결과용)
-export interface VideoPaginationResponse {
-  items: Video[];
+export interface PaginationResponse<T> {
+  items: T[];
   meta: {
     total: number;
     page: number;
     lastPage: number;
   };
 }
+
+export type TopicPaginationResponse = PaginationResponse<Topic>;
+export type VideoPaginationResponse = PaginationResponse<Video>;

@@ -42,6 +42,14 @@ export class VideosController {
     return await this.videosService.findAll(page, 10);
   }
 
+  @Get('topic/:name')
+  async findAllByTopic(
+    @Param('name') name: string,
+    @Query('page') page: number = 1,
+  ) {
+    return await this.videosService.findAllByTopic(name, page, 10);
+  }
+
   @Get(':id')
   findOne(@Param('id') id: string) {
     return this.videosService.findOne(+id);

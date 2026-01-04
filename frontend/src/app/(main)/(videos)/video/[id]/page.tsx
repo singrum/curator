@@ -3,6 +3,7 @@ import { IdtoUrl } from "@/lib/youtube";
 import CommentForm from "./_components/comment-form";
 import Comments from "./_components/comments";
 import MarkdownContent from "./_components/markdown-content";
+import Topics from "./_components/topics";
 
 export default async function Page({
   params,
@@ -49,6 +50,7 @@ export default async function Page({
           allowFullScreen
         />
       </div>
+      <Topics topics={video.topics} />
       <Comments
         comments={video.comments}
         videoId={video.id}

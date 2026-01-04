@@ -3,10 +3,10 @@
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
 
-export default function SubmitButton() {
+export default function TopicButton() {
   return (
     <Button variant={"link"} asChild>
-      <Link href={"/search"}>검색</Link>
+      <Link href={"/topic"}>토픽</Link>
     </Button>
   );
 }

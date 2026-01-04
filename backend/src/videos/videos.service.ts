@@ -14,6 +14,13 @@ import { Topic } from 'src/topics/entities/topic.entity';
 import { CreateVideoDto } from './dto/create-video.dto';
 import { Video } from './entities/video.entity';
 import { YoutubeOEmbed } from './types/youtube';
+
+interface VideoRawResult {
+  video_id: number;
+  video_content?: string;
+  video_video_content?: string; // 드라이버에 따라 이름이 달라질 수 있음
+}
+
 @Injectable()
 export class VideosService {
   constructor(
@@ -23,7 +30,6 @@ export class VideosService {
     private readonly topicRepository: Repository<Topic>,
   ) {}
   async createVideo(createVideoDto: CreateVideoDto, user: User) {
-    console.log(createVideoDto);
     const {
       videoId,
       content,
@@ -70,7 +76,7 @@ export class VideosService {
         submitter: user,
         topics: topics, // 처리된 태그 배열 연결
       });
-      console.log(newVideo);
+
       return await this.videoRepository.save(newVideo);
     } catch (error) {
       if (axios.isAxiosError(error) && error.response?.status === 404) {
@@ -79,13 +85,10 @@ export class VideosService {
       throw error;
     }
   }
-  async findAll(page: number = 1, limit: number = 10) {
-    const skip = (page - 1) * limit;
 
-    // 1. 먼저 비디오 목록의 ID들을 가져옵니다 (페이징 보장)
-    const queryBuilder = this.videoRepository
+  private getBaseQueryBuilder() {
+    return this.videoRepository
       .createQueryBuilder('video')
-      .leftJoinAndSelect('video.submitter', 'submitter')
       .leftJoinAndSelect('video.topics', 'topics')
       .loadRelationCountAndMap('video.commentCount', 'video.comments')
       .select([
@@ -95,42 +98,26 @@ export class VideosService {
         'video.articleTitle',
         'video.authorName',
         'video.createdAt',
-        'video.score',
-        'submitter.id',
-        'submitter.nickname',
-        'topics.id',
         'topics.name',
       ])
-      // 💡 RAW 데이터 매핑 오류를 해결하기 위해 SUBSTRING 결과를 별칭으로 확실히 관리
-      .addSelect('SUBSTRING(video.content, 1, 500)', 'video_content')
-      .orderBy('video.createdAt', 'DESC')
-      .take(limit)
-      .skip(skip);
+      .addSelect('SUBSTRING(video.content, 1, 500)', 'video_content');
+  }
 
-    const { entities, raw } = await queryBuilder.getRawAndEntities();
-    const total = await queryBuilder.getCount();
+  private async processRawAndEntities(entities: Video[], raw: any[]) {
+    const typedRaw = raw as VideoRawResult[];
+    const contentMap = new Map<number, string>();
 
-    // 💡 [해결] raw 데이터에서 각 비디오 ID에 맞는 content를 Map에 저장
-    const contentMap = new Map();
-    raw.forEach(
-      (row: {
-        video_content?: string;
-        video_video_content?: string;
-        video_id?: number;
-      }) => {
-        const content = row.video_content || row.video_video_content;
-        const videoId = row.video_id;
-        if (videoId && !contentMap.has(videoId)) {
-          contentMap.set(videoId, content);
-        }
-      },
-    );
+    typedRaw.forEach((row) => {
+      const content = row.video_content || row.video_video_content;
+      const videoId = row.video_id;
+      if (videoId && !contentMap.has(videoId)) {
+        contentMap.set(videoId, content || '');
+      }
+    });
 
-    const items = await Promise.all(
+    return Promise.all(
       entities.map(async (entity) => {
-        // 💡 인덱스가 아닌 엔티티 ID로 정확한 content를 찾아옴
-        const rawMarkdown: string = (contentMap.get(entity.id) as string) || '';
-
+        const rawMarkdown = contentMap.get(entity.id) || '';
         const processed = await remark().use(strip).process(rawMarkdown);
         const plainText = String(processed)
           .replace(/\n+/g, ' ')
@@ -143,20 +130,60 @@ export class VideosService {
         };
       }),
     );
+  }
+
+  /**
+   * 전체 목록 조회
+   */
+  async findAll(page: number = 1, limit: number = 10) {
+    const skip = (page - 1) * limit;
+    const queryBuilder = this.getBaseQueryBuilder()
+      .orderBy('video.createdAt', 'DESC')
+      .take(limit)
+      .skip(skip);
+
+    const { entities, raw } = await queryBuilder.getRawAndEntities();
+    const total = await queryBuilder.getCount();
+
+    const items = await this.processRawAndEntities(entities, raw);
 
     return { items, meta: { total, page, lastPage: Math.ceil(total / limit) } };
   }
-  // src/videos/videos.service.ts
+
+  /**
+   * 토픽별 목록 조회
+   */
+  async findAllByTopic(
+    topicName: string,
+    page: number = 1,
+    limit: number = 10,
+  ) {
+    const skip = (page - 1) * limit;
+    const queryBuilder = this.getBaseQueryBuilder()
+      .innerJoin(
+        'video.topics',
+        'filterTopic',
+        'filterTopic.name = :topicName',
+        { topicName },
+      )
+      .orderBy('video.createdAt', 'DESC')
+      .take(limit)
+      .skip(skip);
+
+    const { entities, raw } = await queryBuilder.getRawAndEntities();
+    const total = await queryBuilder.getCount();
+
+    const items = await this.processRawAndEntities(entities, raw);
+
+    return { items, meta: { total, page, lastPage: Math.ceil(total / limit) } };
+  }
 
   async findOne(id: number) {
     const queryBuilder = this.videoRepository
       .createQueryBuilder('video')
-      .leftJoinAndSelect('video.submitter', 'submitter')
       .leftJoinAndSelect('video.topics', 'topics')
-      // 1. 댓글 목록과 댓글 작성자를 함께 가져오기 위해 조인 추가
       .leftJoinAndSelect('video.comments', 'comments')
       .leftJoinAndSelect('comments.author', 'author')
-      // 2. 댓글 개수는 기존처럼 유지 (필요하다면)
       .loadRelationCountAndMap('video.commentCount', 'video.comments')
       .where('video.id = :id', { id })
       .select([
@@ -168,20 +195,14 @@ export class VideosService {
         'video.authorUrl',
         'video.content',
         'video.createdAt',
-        'video.score',
         'submitter.id',
         'submitter.nickname',
         'topics.id',
         'topics.name',
-        // 3. 반환할 댓글 필드들 선택 (보안을 위해 필요한 것만)
         'comments.id',
         'comments.content',
         'comments.createdAt',
-        'author.id',
-        'author.nickname',
-        'author.avatarUrl',
       ])
-      // 4. 댓글을 최신순으로 정렬
       .orderBy('comments.createdAt', 'ASC');
 
     const video = await queryBuilder.getOne();

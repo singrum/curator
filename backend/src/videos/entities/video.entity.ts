@@ -41,9 +41,6 @@ export class Video {
   @Column({ type: 'text', nullable: true })
   content: string;
 
-  @Column({ default: 0 })
-  score: number;
-
   @ManyToOne(() => User, (user) => user.videos)
   @JoinColumn({ name: 'submitter_id' })
   submitter: User;

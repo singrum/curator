@@ -77,6 +77,20 @@ export async function getVideos(
   }
 }
 
+export async function getVideosByTopic(
+  name: string,
+  page: number = 1
+): Promise<VideoPaginationResponse> {
+  try {
+    const { data } = await api.get(`/videos/topic/${name}?page=${page}`);
+
+    return data;
+  } catch (error) {
+    console.error("Fetch Videos By Topic Error:", error);
+    return { items: [], meta: { total: 0, lastPage: 1, page } };
+  }
+}
+
 export async function getVideoDetail(videoId: string): Promise<Video | null> {
   try {
     const { data } = await api.get(`/videos/${videoId}`);
@@ -127,7 +141,7 @@ export async function deleteComment(commentId: number, videoId: number) {
     await api.delete(`/comments/${commentId}`);
     revalidatePath(`/video/${videoId}`);
     return { success: true };
-  } catch (error) {
+  } catch {
     return { error: "댓글 삭제 중 오류가 발생했습니다." };
   }
 }

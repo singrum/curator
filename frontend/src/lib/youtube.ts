@@ -20,7 +20,7 @@ export async function getVideoById(
     if (!response.ok) return null;
 
     const data: YoutubeOEmbed = await response.json();
-    console.log(data);
+
     return data;
   } catch {
     return null;
@@ -30,4 +30,3 @@ export async function getVideoById(
 export function IdtoUrl(videoId: string): string {
   return `https://www.youtube.com/watch?v=${videoId}`;
 }
-

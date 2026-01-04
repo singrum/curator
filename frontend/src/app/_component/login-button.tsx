@@ -3,7 +3,7 @@ import Link from "next/link";
 
 export default function LoginButton() {
   return (
-    <Button variant={"link"} asChild>
+    <Button variant={"secondary"} asChild size="sm" className="text-xs">
       <Link href="/login">로그인</Link>
     </Button>
   );

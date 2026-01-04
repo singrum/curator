@@ -43,7 +43,7 @@ export default function VideoItem({ data }: { data: Video }) {
                 timeStyle: "short",
                 hour12: false,
               })}{" "}
-              | 댓글 {data.commentCount}개
+              | 댓글: {data.commentCount}
             </ItemDescription>
           </Link>
         </div>

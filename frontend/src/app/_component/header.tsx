@@ -10,20 +10,20 @@ import HomeButton from "./home-button";
 import LoginButton from "./login-button";
 import LogoutButton from "./logout-button";
 import ProfileButton from "./profile-button";
-import SearchButton from "./search-button";
 import SubmitButton from "./submit-button";
+import TagButton from "./topic-button";
 
 export default function Header() {
   const user = useUserStore((e) => e.user);
   const menus = [
     <HomeButton key={0} />,
-    <SearchButton key={1} />,
+    <TagButton key={1} />,
     <SubmitButton key={2} />,
     <ProfileButton key={3} />,
   ];
   return (
     <header className="space-y-0">
-      <div className="px-2 sm:px-4 items-center flex justify-between h-13 w-full">
+      <div className="pl-2 pr-4 sm:pl-4 sm:px-6 items-center flex justify-between h-13 w-full">
         <Button className="px-2" variant={"ghost"} asChild>
           <Link href="/">
             <Logo />
