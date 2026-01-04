@@ -12,8 +12,9 @@ export default async function Page() {
   if (!user) {
     redirect("/login");
   }
+
   if (user.role == UserRole.GENERAL) {
-    <GeneralRoleAlert />;
+    return <GeneralRoleAlert />;
   }
   return (
     <div>

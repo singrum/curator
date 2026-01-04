@@ -2,6 +2,7 @@
 
 import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
+import { UserRole } from "@/constants/role";
 import { deleteComment } from "@/lib/actions/video";
 import { Comment } from "@/lib/types";
 import { useUserStore } from "@/providers/user-store-provider";
@@ -53,7 +54,8 @@ export default function Comments({
       <div className="space-y-4">
         {comments.map((comment: Comment, index: number) => {
           const isMine = user && user.id === comment.author.id;
-          // 💡 현재 ID가 삭제 중인 목록에 포함되어 있는지 확인
+          const isAdmin = user && user.role === UserRole.ADMIN; // 어드민 여부 확인
+          const canDelete = isMine || isAdmin; // 삭제 권한이 있는지 확인
           const isDeleting = deletingIds.has(comment.id);
 
           return (
@@ -73,9 +75,11 @@ export default function Comments({
                       </span>
                     </div>
 
-                    {isMine && (
+                    {canDelete && (
                       <Button
-                        variant="ghost"
+                        className="text-xs"
+                        variant="secondary"
+                        size="sm"
                         onClick={() => handleDelete(comment.id)}
                         disabled={isDeleting} // 💡 해당 댓글만 비활성화
                       >

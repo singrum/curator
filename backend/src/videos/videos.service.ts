@@ -197,6 +197,8 @@ export class VideosService {
         'video.createdAt',
         'topics.id',
         'topics.name',
+        'author.id',
+        'author.nickname',
         'comments.id',
         'comments.content',
         'comments.createdAt',
