@@ -1,6 +1,11 @@
 import { Button } from "@/components/ui/button";
 import { SiGoogle } from "@icons-pack/react-simple-icons";
 import Link from "next/link";
+
+export const metadata = {
+  title: "로그인",
+};
+
 export default function Page() {
   return (
     <div className="space-y-6">

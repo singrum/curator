@@ -1,6 +1,22 @@
 import { getVideosByTopic } from "@/lib/actions/video";
+import { Metadata } from "next";
 import VideoItem from "../../(videos)/_components/video-item";
 import { TopicDetailPagination } from "./_components/topic-detail-pagination";
+
+export async function generateMetadata({
+  params,
+}: {
+  params: Promise<{ topicId: string }>;
+}): Promise<Metadata> {
+  const { topicId } = await params;
+
+  // fetch post information
+
+  return {
+    title: `${decodeURIComponent(topicId)} | 큐레이터`,
+    description: "",
+  };
+}
 
 export default async function TopicDetailPage({
   params,
@@ -19,9 +35,7 @@ export default async function TopicDetailPage({
     <div className="space-y-6">
       {/* 토픽 제목 표시부 (선택 사항) */}
       <div className="pb-4 border-b">
-        <h1 className="text-2xl font-bold tracking-tight">
-          {decodeURIComponent(topicName)}
-        </h1>
+        <h1 className="text-2xl font-bold">{decodeURIComponent(topicName)}</h1>
       </div>
 
       {/* 비디오 리스트 */}

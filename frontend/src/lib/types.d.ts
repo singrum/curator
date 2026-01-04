@@ -34,7 +34,7 @@ export interface Video {
   articleTitle: string;
   authorName: string;
   authorUrl: string;
-  content: string | null;
+  content: string;
   topics: Topic[];
   comments: Comment[];
   commentCount: number;

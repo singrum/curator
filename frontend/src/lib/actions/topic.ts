@@ -10,8 +10,7 @@ export async function getTopics(
   try {
     const { data } = await api.get(`/topics?page=${page}`);
     return data;
-  } catch (error) {
-    console.error("Fetch Topics Error:", error);
+  } catch {
     return { items: [], meta: { total: 0, lastPage: 1, page } };
   }
 }

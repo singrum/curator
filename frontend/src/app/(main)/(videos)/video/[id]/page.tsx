@@ -1,9 +1,30 @@
 import { getVideoDetail } from "@/lib/actions/video";
 import { IdtoUrl } from "@/lib/youtube";
+import { Metadata } from "next";
 import CommentForm from "./_components/comment-form";
 import Comments from "./_components/comments";
 import MarkdownContent from "./_components/markdown-content";
 import Topics from "./_components/topics";
+
+export async function generateMetadata({
+  params,
+}: {
+  params: Promise<{ id: string }>;
+}): Promise<Metadata> {
+  const { id } = await params;
+
+  const video = await getVideoDetail(id);
+  if (!video) {
+    return {
+      title: "404 Not Found",
+      description: "",
+    };
+  }
+  return {
+    title: video.articleTitle,
+    description: video.content.slice(0, 160),
+  };
+}
 
 export default async function Page({
   params,

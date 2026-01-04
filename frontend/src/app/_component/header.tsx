@@ -33,7 +33,7 @@ export default function Header() {
           {user ? <LogoutButton /> : <LoginButton />}
         </div>
       </div>
-      <div className="bg-blue-200 rounded-sm flex items-center mx-3 sm:mx-5 px-2 h-10">
+      <div className="bg-blue-200 rounded-xs flex items-center mx-3 sm:mx-5 px-2 h-10">
         <div className="flex items-center h-3">
           {menus.map((e, i) => (
             <Fragment key={i}>

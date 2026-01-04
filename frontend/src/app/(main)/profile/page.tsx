@@ -4,6 +4,10 @@ import { redirect } from "next/navigation";
 import NicknameForm from "./_component/nickname-form";
 import RoleForm from "./_component/role-form";
 
+export const metadata = {
+  title: "내 프로필",
+};
+
 export default async function Page() {
   const user = await getUser();
   if (!user) {
@@ -11,7 +15,9 @@ export default async function Page() {
   }
   return (
     <div>
-      <h1 className="text-2xl font-bold mb-6">내 프로필</h1>
+      <div className="pb-4 border-b mb-6">
+        <h1 className="text-2xl font-bold">내 프로필</h1>
+      </div>
       <div className="space-y-6">
         <NicknameForm />
         <RoleForm />
