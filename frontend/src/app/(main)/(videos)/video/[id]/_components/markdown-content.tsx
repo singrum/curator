@@ -16,13 +16,8 @@ export default function MarkdownContent({ children }: { children: string }) {
       className={cn(
         "prose max-w-none text-foreground dark:prose-invert prose-sm sm:prose-base",
 
-        // 1단계: 기본 불릿 (disc)
         "prose-ul:list-disc",
-
-        // 2단계: 하위 ul은 빈 원 (circle)
         "[&_ul_ul]:list-[circle]",
-
-        // 3단계: 그 하위 ul은 사각형 (square)
         "[&_ul_ul_ul]:list-[square]",
 
         "[--tw-prose-bullets:var(--foreground)]",

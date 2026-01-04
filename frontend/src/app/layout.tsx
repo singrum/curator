@@ -29,6 +29,7 @@ export default async function RootLayout({
       suppressHydrationWarning
       className={`${NotoSansKr.className} antialiased`}
     >
+      <link rel="icon" href="/icon.svg" sizes="any" />
       <body className="min-h-screen flex flex-col">
         <ThemeProvider
           attribute="class"
