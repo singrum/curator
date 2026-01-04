@@ -1,0 +1,23 @@
+name: Mirror main and dev to singrum2
+
+on:
+  push:
+    branches: ["main", "dev"]
+
+jobs:
+  mirror:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout source repo
+        uses: actions/checkout@v3
+        with:
+          repository: singrum/curator
+          token: ${{ secrets.GITHUB_TOKEN }}
+          ref: ${{ github.ref_name }}
+          fetch-depth: 0
+          persist-credentials: false
+
+      - name: Push to target repo
+        run: |
+
+          git push -f https://x-access-token:${{ secrets.SYNC_TOKEN }}@github.com/singrum3/curator-deploy.git ${{ github.ref_name }}

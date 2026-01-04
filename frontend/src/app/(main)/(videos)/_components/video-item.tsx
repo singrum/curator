@@ -11,22 +11,6 @@ import { Video } from "@/lib/types";
 export default function VideoItem({ data }: { data: Video }) {
   return (
     <Item key={data.id} className="p-0 flex-nowrap items-stretch">
-      {/* <a
-        href={`https://www.youtube.com/watch?v=${data.videoId}`}
-        target="_blank"
-        rel="noopener noreferrer"
-      >
-        <ItemMedia variant="image" className="h-20 w-auto aspect-video">
-          <Image
-            src={`https://img.youtube.com/vi/${data.videoId}/maxresdefault.jpg`}
-            alt={"main image"}
-            width={160}
-            height={200}
-            className="mx-auto rounded-lg "
-          />
-        </ItemMedia>
-      </a> */}
-
       <ItemContent className="flex flex-col justify-between">
         <div className="flex">
           <Link href={`/video/${data.id}`} className="space-y-1">
