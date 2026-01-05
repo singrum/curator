@@ -26,6 +26,7 @@ export class VideosController {
     @Body() createVideoDto: CreateVideoDto,
     @Req() req: RequestWithUser,
   ) {
+    console.log(req);
     // 1. 가드에 의해 req.user에 로그인한 유저 정보가 담겨있다고 가정합니다.
     const user = req.user as User;
 
