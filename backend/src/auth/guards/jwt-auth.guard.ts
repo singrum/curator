@@ -34,13 +34,17 @@ export class JwtAuthGuard implements CanActivate {
     const refreshToken = req.cookies?.['refresh_token'];
 
     if (accessToken) {
-      // 1. 토큰 생성 시점에 role을 넣었다면 여기서 바로 꺼낼 수 있습니다.
-      const payload = this.jwtService.verify<{
-        userId: number;
-        role: number;
-      }>(accessToken);
-      req.user = { id: payload.userId, role: payload.role };
-      return true;
+      try {
+        const payload = this.jwtService.verify<{
+          userId: number;
+          role: number;
+        }>(accessToken);
+
+        req.user = { id: payload.userId, role: payload.role };
+        return true; 
+      } catch {
+        console.log('Access token expired, checking refresh token...');
+      }
     }
 
     if (!refreshToken) throw new UnauthorizedException('Authentication failed');
