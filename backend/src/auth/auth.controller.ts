@@ -51,7 +51,7 @@ export class AuthController {
       httpOnly: true,
       secure: true,
       maxAge: 1000 * 60 * 15, // 15분 정도
-      sameSite: 'lax',
+      sameSite: 'none',
       path: '/', // 전체 경로에서 사용 가능
     });
 
@@ -60,7 +60,7 @@ export class AuthController {
       httpOnly: true,
       secure: true,
       maxAge: 1000 * 60 * 60 * 24 * 7, // 7일 정도
-      sameSite: 'lax', // OAuth redirect 필요한 경우 none
+      sameSite: 'none', // OAuth redirect 필요한 경우 none
       path: '/', // 전체 경로에서 사용 가능
     });
 
@@ -83,7 +83,7 @@ export class AuthController {
     res.cookie('jwt', accessToken, {
       httpOnly: true,
       secure: true,
-      sameSite: 'strict',
+      sameSite: 'none',
     });
     return { user };
   }

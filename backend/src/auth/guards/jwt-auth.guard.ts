@@ -58,7 +58,7 @@ export class JwtAuthGuard implements CanActivate {
         httpOnly: true,
         secure: true,
 
-        sameSite: 'lax',
+        sameSite: 'none',
         path: '/',
       });
 
