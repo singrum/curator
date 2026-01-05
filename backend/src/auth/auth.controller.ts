@@ -65,7 +65,7 @@ export class AuthController {
     });
 
     // 클라이언트 리다이렉트
-    return res.redirect('http://localhost:3000');
+    return res.redirect(process.env.CLIENT_URL || 'http://localhost:3000');
   }
 
   @Post('refresh')
