@@ -19,6 +19,7 @@ async function bootstrap() {
     origin: process.env.CLIENT_URL,
     credentials: true,
   });
-  await app.listen(process.env.PORT ?? 3001);
+  const port = process.env.PORT || 3000;
+  await app.listen(port, '0.0.0.0');
 }
 bootstrap();

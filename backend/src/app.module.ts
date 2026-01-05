@@ -21,6 +21,7 @@ import { VideosModule } from './videos/videos.module';
 
         url: configService.get<string>('DATABASE_URL'),
         entities: [__dirname + '/**/*.entity{.ts,.js}'],
+        autoLoadEntities: true,
         synchronize: true,
         logging: true,
 
