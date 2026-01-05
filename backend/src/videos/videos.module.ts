@@ -1,7 +1,7 @@
 import { Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
-import { AuthModule } from 'src/auth/auth.module';
-import { Topic } from 'src/topics/entities/topic.entity';
+import { AuthModule } from '../auth/auth.module';
+import { Topic } from '../topics/entities/topic.entity';
 import { Video } from './entities/video.entity';
 import { VideosController } from './videos.controller';
 import { VideosService } from './videos.service';

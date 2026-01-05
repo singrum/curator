@@ -7,8 +7,8 @@ import {
   Post,
   Req,
 } from '@nestjs/common';
-import { Auth } from 'src/auth/decorators/auth.decorator';
-import type { RequestWithUser } from 'src/auth/guards/jwt-auth.guard';
+import { Auth } from '../auth/decorators/auth.decorator';
+import type { RequestWithUser } from '../auth/guards/jwt-auth.guard';
 import { CommentsService } from './comments.service';
 import { CreateCommentDto } from './dto/create-comment.dto';
 

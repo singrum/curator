@@ -12,7 +12,7 @@ import {
 import { JwtService } from '@nestjs/jwt';
 import { AuthGuard } from '@nestjs/passport';
 import type { Request, Response } from 'express';
-import { UsersService } from 'src/users/users.service';
+import { UsersService } from '../users/users.service';
 import { AuthService } from './auth.service';
 import { Auth } from './decorators/auth.decorator';
 import type { RequestWithUser } from './guards/jwt-auth.guard';

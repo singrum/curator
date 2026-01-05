@@ -1,7 +1,4 @@
 // src/videos/entities/video.entity.ts
-import { Comment } from 'src/comments/entities/comment.entity';
-import { Topic } from 'src/topics/entities/topic.entity';
-import { User } from 'src/users/user.entity';
 import {
   Column,
   CreateDateColumn,
@@ -14,6 +11,9 @@ import {
   PrimaryGeneratedColumn,
   VirtualColumn,
 } from 'typeorm';
+import { Comment } from '../../comments/entities/comment.entity';
+import { Topic } from '../../topics/entities/topic.entity';
+import { User } from '../../users/user.entity';
 
 @Entity()
 export class Video {

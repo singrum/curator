@@ -6,11 +6,11 @@ import {
 import { InjectRepository } from '@nestjs/typeorm';
 import axios from 'axios';
 import { remark } from 'remark';
-import { User } from 'src/users/user.entity';
 import strip from 'strip-markdown';
 import { Repository } from 'typeorm';
+import { User } from '../users/user.entity';
 
-import { Topic } from 'src/topics/entities/topic.entity';
+import { Topic } from '../topics/entities/topic.entity';
 import { CreateVideoDto } from './dto/create-video.dto';
 import { Video } from './entities/video.entity';
 import { YoutubeOEmbed } from './types/youtube';

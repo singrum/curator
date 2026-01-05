@@ -1,5 +1,3 @@
-import { Comment } from 'src/comments/entities/comment.entity';
-import { Video } from 'src/videos/entities/video.entity';
 import {
   Column,
   CreateDateColumn,
@@ -7,7 +5,9 @@ import {
   OneToMany,
   PrimaryGeneratedColumn,
 } from 'typeorm';
+import { Comment } from '../comments/entities/comment.entity';
 import { UserRole } from '../common/constants/role';
+import { Video } from '../videos/entities/video.entity';
 @Entity()
 export class User {
   @PrimaryGeneratedColumn()

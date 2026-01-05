@@ -9,10 +9,10 @@ import {
   Query,
   Req,
 } from '@nestjs/common';
-import { Auth } from 'src/auth/decorators/auth.decorator';
-import type { RequestWithUser } from 'src/auth/guards/jwt-auth.guard';
-import { UserRole } from 'src/common/constants/role';
-import { User } from 'src/users/user.entity';
+import { Auth } from '../auth/decorators/auth.decorator';
+import type { RequestWithUser } from '../auth/guards/jwt-auth.guard';
+import { UserRole } from '../common/constants/role';
+import { User } from '../users/user.entity';
 import { CreateVideoDto } from './dto/create-video.dto';
 import { VideosService } from './videos.service';
 

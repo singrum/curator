@@ -1,4 +1,3 @@
-import { Video } from 'src/videos/entities/video.entity';
 import {
   Column,
   Entity,
@@ -6,6 +5,7 @@ import {
   ManyToMany,
   PrimaryGeneratedColumn,
 } from 'typeorm';
+import { Video } from '../../videos/entities/video.entity';
 
 @Entity()
 export class Topic {
