@@ -113,18 +113,22 @@ export class VideosService {
       }
     });
 
-    // 💡 비동기(Promise.all)를 제거하고 마크다운 원문을 그대로 반환합니다.
     return entities.map((entity) => {
       const rawMarkdown = contentMap.get(entity.id) || '';
 
+      // 1. 마크다운 볼드 문법 제거 (정규식 사용)
+      // **text** 또는 __text__ 패턴을 찾아 내부 'text'만 남깁니다.
+      const cleanText = rawMarkdown
+        .replace(/\*\*+(.*?)\*\*+/g, '$1')
+        .replace(/__+(.*?)__+/g, '$1');
+
       return {
         ...entity,
-        // 마크다운 가공 없이 그대로 전달 (필요 시 글자 수만 제한)
-        content: rawMarkdown.slice(0, 500),
+        // 2. 가공된 텍스트에서 500자 제한
+        content: cleanText.slice(0, 500),
       };
     });
   }
-
   /**
    * 전체 목록 조회
    */
