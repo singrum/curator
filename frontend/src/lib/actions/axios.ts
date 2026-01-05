@@ -16,8 +16,13 @@ api.interceptors.request.use(async (config) => {
       const cookieStore = await cookies();
       const cookieString = cookieStore.toString();
 
-      if (cookieString) {
-        config.headers.Cookie = cookieString;
+      const allCookies = cookieStore.getAll();
+      if (allCookies.length > 0) {
+        const cookieHeader = allCookies
+          .map((c) => `${c.name}=${encodeURIComponent(c.value)}`)
+          .join("; ");
+
+        config.headers.Cookie = cookieHeader;
       }
     } catch (error) {
       console.warn("No cookie context found");
