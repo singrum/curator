@@ -5,8 +5,7 @@ import {
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import axios from 'axios';
-import { remark } from 'remark';
-import strip from 'strip-markdown';
+
 import { Repository } from 'typeorm';
 import { User } from '../users/user.entity';
 
@@ -102,8 +101,7 @@ export class VideosService {
       ])
       .addSelect('SUBSTRING(video.content, 1, 500)', 'video_content');
   }
-
-  private async processRawAndEntities(entities: Video[], raw: any[]) {
+  private processRawAndEntities(entities: Video[], raw: any[]) {
     const typedRaw = raw as VideoRawResult[];
     const contentMap = new Map<number, string>();
 
@@ -115,21 +113,16 @@ export class VideosService {
       }
     });
 
-    return Promise.all(
-      entities.map(async (entity) => {
-        const rawMarkdown = contentMap.get(entity.id) || '';
-        const processed = await remark().use(strip).process(rawMarkdown);
-        const plainText = String(processed)
-          .replace(/\n+/g, ' ')
-          .trim()
-          .slice(0, 150);
+    // 💡 비동기(Promise.all)를 제거하고 마크다운 원문을 그대로 반환합니다.
+    return entities.map((entity) => {
+      const rawMarkdown = contentMap.get(entity.id) || '';
 
-        return {
-          ...entity,
-          content: plainText,
-        };
-      }),
-    );
+      return {
+        ...entity,
+        // 마크다운 가공 없이 그대로 전달 (필요 시 글자 수만 제한)
+        content: rawMarkdown.slice(0, 500),
+      };
+    });
   }
 
   /**
@@ -145,7 +138,7 @@ export class VideosService {
     const { entities, raw } = await queryBuilder.getRawAndEntities();
     const total = await queryBuilder.getCount();
 
-    const items = await this.processRawAndEntities(entities, raw);
+    const items = this.processRawAndEntities(entities, raw);
 
     return { items, meta: { total, page, lastPage: Math.ceil(total / limit) } };
   }
@@ -173,7 +166,7 @@ export class VideosService {
     const { entities, raw } = await queryBuilder.getRawAndEntities();
     const total = await queryBuilder.getCount();
 
-    const items = await this.processRawAndEntities(entities, raw);
+    const items = this.processRawAndEntities(entities, raw);
 
     return { items, meta: { total, page, lastPage: Math.ceil(total / limit) } };
   }
