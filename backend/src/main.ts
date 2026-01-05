@@ -1,7 +1,22 @@
 import { ValidationPipe } from '@nestjs/common';
 import { NestFactory } from '@nestjs/core';
 import cookieParser from 'cookie-parser';
+import { register } from 'tsconfig-paths';
+import tsConfig from '../tsconfig.json';
 import { AppModule } from './app.module';
+
+type TsConfig = {
+  compilerOptions?: {
+    baseUrl?: string;
+    paths?: { [key: string]: string[] };
+  };
+};
+
+const tsConfigObj: TsConfig = tsConfig as TsConfig;
+register({
+  baseUrl: tsConfigObj.compilerOptions?.baseUrl || './',
+  paths: tsConfigObj.compilerOptions?.paths || {},
+});
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
