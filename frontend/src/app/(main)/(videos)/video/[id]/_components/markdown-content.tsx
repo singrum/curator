@@ -11,6 +11,14 @@ import { cn } from "@/lib/utils";
 import "highlight.js/styles/github-dark.css"; // 하이라이트 스타일
 import "katex/dist/katex.min.css";
 export default function MarkdownContent({ children }: { children: string }) {
+  const processedContent = children.replace(
+    /(\*\*)([^*]*[\(\)][^*]*)(\*\*)(?!\s|$)/g,
+    (match, p1, p2, p3) => {
+      // p1: **, p2: 볼드 내부 텍스트, p3: **
+      // 내부 텍스트(p2)에 괄호가 있고, 뒤에 공백이 없는 경우에만 공백 추가
+      return `${p1}${p2}${p3} `;
+    }
+  );
   return (
     <div
       className={cn(
@@ -33,7 +41,7 @@ export default function MarkdownContent({ children }: { children: string }) {
         remarkPlugins={[remarkGfm, remarkMath]}
         rehypePlugins={[rehypeHighlight, rehypeKatex]}
       >
-        {children}
+        {processedContent}
       </ReactMarkdown>
     </div>
   );
