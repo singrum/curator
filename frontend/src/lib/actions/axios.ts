@@ -14,7 +14,6 @@ api.interceptors.request.use(async (config) => {
   if (typeof window === "undefined") {
     try {
       const cookieStore = await cookies();
-      const cookieString = cookieStore.toString();
 
       const allCookies = cookieStore.getAll();
       if (allCookies.length > 0) {
@@ -23,6 +22,12 @@ api.interceptors.request.use(async (config) => {
           .join("; ");
 
         config.headers.Cookie = cookieHeader;
+
+        // 💡 디버깅용 로그 (프론트엔드 Vercel 로그에서 확인 가능)
+        console.log(
+          "[Server-Side Request] Cookie Header attached:",
+          cookieHeader
+        );
       }
     } catch (error) {
       console.warn("No cookie context found");
