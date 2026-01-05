@@ -9,6 +9,7 @@ import { JwtService } from '@nestjs/jwt';
 import { AuthService } from '../auth.service';
 
 import { Request, Response } from 'express';
+import { cookieOptions } from '../constants/cookie-options';
 
 export interface RequestWithUser extends Request {
   cookies: {
@@ -58,13 +59,7 @@ export class JwtAuthGuard implements CanActivate {
       const { accessToken: newAccessToken, user } =
         await this.authService.refreshToken(refreshToken);
 
-      res.cookie('jwt', newAccessToken, {
-        httpOnly: true,
-        secure: true,
-
-        sameSite: 'none',
-        path: '/',
-      });
+      res.cookie('jwt', newAccessToken, cookieOptions);
 
       req.user = { id: user.id, role: user.role }; // 갱신된 정보 주입
       return true;

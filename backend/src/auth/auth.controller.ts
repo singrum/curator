@@ -14,6 +14,7 @@ import { AuthGuard } from '@nestjs/passport';
 import type { Request, Response } from 'express';
 import { UsersService } from '../users/users.service';
 import { AuthService } from './auth.service';
+import { cookieOptions } from './constants/cookie-options';
 import { Auth } from './decorators/auth.decorator';
 import type { RequestWithUser } from './guards/jwt-auth.guard';
 import { OAuthProfile } from './types/oauth-profile';
@@ -46,23 +47,9 @@ export class AuthController {
       await this.authService.oauthLogin(user);
     // 디버깅 로그 추가
 
-    // Access token
-    res.cookie('jwt', accessToken, {
-      httpOnly: true,
-      secure: true,
-      maxAge: 1000 * 60 * 15, // 15분 정도
-      sameSite: 'none',
-      path: '/', // 전체 경로에서 사용 가능
-    });
+    res.cookie('jwt', accessToken, cookieOptions);
 
-    // Refresh token
-    res.cookie('refresh_token', refreshToken, {
-      httpOnly: true,
-      secure: true,
-      maxAge: 1000 * 60 * 60 * 24 * 7, // 7일 정도
-      sameSite: 'none', // OAuth redirect 필요한 경우 none
-      path: '/', // 전체 경로에서 사용 가능
-    });
+    res.cookie('refresh_token', refreshToken, cookieOptions);
 
     // 클라이언트 리다이렉트
     return res.redirect(process.env.CLIENT_URL || 'http://localhost:3000');
@@ -80,11 +67,7 @@ export class AuthController {
     const { accessToken, user } =
       await this.authService.refreshToken(refreshToken);
 
-    res.cookie('jwt', accessToken, {
-      httpOnly: true,
-      secure: true,
-      sameSite: 'none',
-    });
+    res.cookie('jwt', accessToken, cookieOptions);
     return { user };
   }
 
