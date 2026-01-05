@@ -8,7 +8,7 @@ export default function SubmitButton() {
   const user = useUserStore((e) => e.user);
   return (
     <Button variant={"link"} asChild>
-      <Link href={user ? "/submit" : "/login"}>제출</Link>
+      <Link href={user ? "/submit" : "/auth/login"}>제출</Link>
     </Button>
   );
 }
