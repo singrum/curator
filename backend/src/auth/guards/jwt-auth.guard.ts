@@ -56,7 +56,8 @@ export class JwtAuthGuard implements CanActivate {
 
       res.cookie('jwt', newAccessToken, {
         httpOnly: true,
-        secure: process.env.NODE_ENV === 'production',
+        secure: true,
+
         sameSite: 'lax',
         path: '/',
       });
