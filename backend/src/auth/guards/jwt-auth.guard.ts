@@ -41,7 +41,7 @@ export class JwtAuthGuard implements CanActivate {
         }>(accessToken);
 
         req.user = { id: payload.userId, role: payload.role };
-        return true; 
+        return true;
       } catch {
         console.log('Access token expired, checking refresh token...');
       }

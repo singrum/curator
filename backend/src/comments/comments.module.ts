@@ -11,7 +11,7 @@ import { Comment } from './entities/comment.entity';
     TypeOrmModule.forFeature([Comment]),
     JwtModule.register({
       secret: process.env.JWT_SECRET, // 환경변수 확인
-      signOptions: { expiresIn: '15m' },
+      signOptions: { expiresIn: '1h' },
     }),
     AuthModule,
   ],
