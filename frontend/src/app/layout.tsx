@@ -13,11 +13,10 @@ const NotoSansKr = Noto_Sans_KR({
 
 export const metadata: Metadata = {
   title: "큐레이터",
-  description: "유튜브 큐레이팅 서비스",
+  description: "유튜브 큐레이션 블로그",
   icons: {
     icon: "/icon.svg",
   },
-  
 };
 
 export default async function RootLayout({
