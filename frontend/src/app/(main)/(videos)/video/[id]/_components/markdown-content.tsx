@@ -21,7 +21,7 @@ export default function MarkdownContent({ children }: { children: string }) {
         "[&_ul_ul_ul]:list-[square]",
 
         "[--tw-prose-bullets:var(--foreground)]",
-
+        "h1:text-base h2:text-base h3:text-base h4:text-base h5:text-base h6:text-base",
         "prose-code:before:content-none prose-code:after:content-none",
         "prose-code:bg-muted prose-code:px-1.5 prose-code:py-0.5 prose-code:rounded-md prose-code:font-medium",
         "prose-a:text-link prose-a:underline prose-a:font-medium prose-a:underline-offset-4",

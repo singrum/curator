@@ -4,6 +4,7 @@ import { cookies } from "next/headers"; // Next.js 서버의 쿠키를 가져오
 export const api = axios.create({
   baseURL: process.env.API_BASE_URL,
   timeout: 5000,
+  withCredentials: true,
   headers: {
     "Content-Type": "application/json",
   },
