@@ -29,6 +29,10 @@ export class JwtAuthGuard implements CanActivate {
     const req = context.switchToHttp().getRequest<RequestWithUser>();
     const res = context.switchToHttp().getResponse<Response>();
 
+    // 💡 디버깅용: 쿠키가 아예 안 들어오는지 확인
+    console.log('Raw Cookies Header:', req.headers.cookie);
+    console.log('Parsed Cookies:', req.cookies);
+
     const accessToken = req.cookies?.['jwt'];
     const refreshToken = req.cookies?.['refresh_token'];
 
