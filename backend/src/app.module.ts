@@ -23,7 +23,6 @@ import { VideosModule } from './videos/videos.module';
         entities: [__dirname + '/**/*.entity{.ts,.js}'],
         autoLoadEntities: true,
         synchronize: true,
-        logging: true,
 
         ssl: true,
         extra: {
