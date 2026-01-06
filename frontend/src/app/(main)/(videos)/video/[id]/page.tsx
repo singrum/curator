@@ -24,7 +24,10 @@ export async function generateMetadata({
   }
   return {
     title: video.articleTitle,
-    description: video.content.slice(0, 160),
+    description: video.content
+      .replace(/\*\*+(.*?)\*\*+/g, "$1")
+      .replace(/__+(.*?)__+/g, "$1")
+      .slice(0, 160),
   };
 }
 
@@ -35,6 +38,7 @@ export default async function Page({
 }) {
   const { id } = await params;
   const video = await getVideoDetail(id);
+  
   if (!video) {
     return <div>비디오를 찾을 수 없습니다.</div>;
   }
