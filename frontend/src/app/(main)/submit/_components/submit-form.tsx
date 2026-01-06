@@ -103,7 +103,7 @@ export default function SubmitForm() {
             placeholder="https://www.youtube.com/watch?v=..."
             value={url}
             onChange={handleUrlChange}
-            className={cn("max-w-md", { "border-destructive": isInvalidUrl })}
+            className={cn({ "border-destructive": isInvalidUrl })}
           />
         </div>
         {isInvalidUrl && (
@@ -114,7 +114,7 @@ export default function SubmitForm() {
       </div>
 
       {video && (
-        <div className="max-w-md w-full rounded-xs border bg-muted/50 p-4 flex flex-col gap-4">
+        <div className="w-full rounded-xs border bg-muted/50 p-4 flex flex-col gap-4">
           <div className="relative aspect-video w-full overflow-hidden rounded-md border bg-black">
             <Image
               src={video.thumbnail_url}
@@ -130,16 +130,30 @@ export default function SubmitForm() {
           </div>
         </div>
       )}
-      <Button
-        variant="outline"
-        className="max-w-md w-full"
-        onClick={() =>
-          window.open("https://gemini.google.com/app?hl=ko", "_blank")
-        }
-      >
-        Gemini 열기 <ExternalLink className="ml-2 h-4 w-4" />
-      </Button>
-      <div className="space-y-8 max-w-md w-full">
+      <div className="space-y-2">
+        <Button
+          variant="outline"
+          className="w-full"
+          onClick={() =>
+            window.open("https://gemini.google.com/app?hl=ko", "_blank")
+          }
+        >
+          Gemini 열기 <ExternalLink className="ml-2 h-4 w-4" />
+        </Button>
+        <Button
+          variant="outline"
+          className="w-full"
+          onClick={() =>
+            window.open(
+              "https://aistudio.google.com/prompts/new_chat",
+              "_blank"
+            )
+          }
+        >
+          AI Studio 열기 <ExternalLink className="ml-2 h-4 w-4" />
+        </Button>
+      </div>
+      <div className="space-y-8 w-full">
         {/* 본문 입력 + 프롬프트 복사 */}
         <div className="space-y-2">
           <Label htmlFor="content">본문</Label>
@@ -203,7 +217,7 @@ export default function SubmitForm() {
       </div>
 
       <Button
-        className="w-full max-w-md"
+        className="w-full"
         variant="secondary"
         disabled={!video || isLoading || isSubmitting || !articleTitle}
         onClick={handleSubmit}

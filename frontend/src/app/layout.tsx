@@ -45,7 +45,7 @@ export default async function RootLayout({
             key={user === null ? "null" : user.id + "," + user.nickname}
           >
             <Header />
-            <main className="p-4 sm:p-6 max-w-3xl w-full">{children}</main>
+            <main className="p-4 sm:p-6 max-w-2xl w-full">{children}</main>
             <Toaster />
           </UserStoreProvider>
         </ThemeProvider>

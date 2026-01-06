@@ -2,7 +2,6 @@
 
 import Logo from "@/components/logo/logo";
 import { Button } from "@/components/ui/button";
-import { Separator } from "@/components/ui/separator";
 import { useUserStore } from "@/providers/user-store-provider";
 import Link from "next/link";
 import { Fragment } from "react/jsx-runtime";
@@ -34,16 +33,11 @@ export default function Header() {
         </div>
       </div>
       <div className="bg-blue-200 rounded-xs flex items-center mx-3 sm:mx-5 px-2 h-10">
-        <div className="flex items-center h-3">
+        <div className="flex items-center h-3 gap-1">
           {menus.map((e, i) => (
             <Fragment key={i}>
               {e}
-              {i < menus.length - 1 && (
-                <Separator
-                  orientation="vertical"
-                  className="bg-muted-foreground mx-1"
-                />
-              )}
+              {i < menus.length - 1 && "|"}
             </Fragment>
           ))}
         </div>

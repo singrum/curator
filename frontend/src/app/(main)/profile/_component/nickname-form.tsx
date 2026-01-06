@@ -43,6 +43,7 @@ export default function NicknameForm() {
           />
           <Button
             variant="secondary"
+            className="h-9"
             onClick={handleSave}
             disabled={
               isLoading || nickname === user?.nickname || nickname.length === 0
