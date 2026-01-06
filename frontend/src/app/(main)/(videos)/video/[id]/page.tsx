@@ -38,7 +38,7 @@ export default async function Page({
 }) {
   const { id } = await params;
   const video = await getVideoDetail(id);
-  
+
   if (!video) {
     return <div>비디오를 찾을 수 없습니다.</div>;
   }
