@@ -6,6 +6,8 @@ import Comments from "./_components/comments";
 import MarkdownContent from "./_components/markdown-content";
 import Topics from "./_components/topics";
 
+export const revalidate = 100000000; // 임시로 매우 큰 값 설정
+
 export async function generateMetadata({
   params,
 }: {

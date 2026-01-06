@@ -4,6 +4,7 @@
 import { isAxiosError } from "axios";
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
+import { cache } from "react";
 import { Video, VideoPaginationResponse } from "../types";
 import { getUser } from "./auth";
 import { api } from "./axios";
@@ -91,15 +92,19 @@ export async function getVideosByTopic(
   }
 }
 
-export async function getVideoDetail(videoId: string): Promise<Video | null> {
-  try {
-    const { data } = await api.get(`/videos/${videoId}`);
-    return data;
-  } catch (error) {
-    console.error("Fetch Video Detail Error:", error);
-    return null;
+export const getVideoDetail = cache(
+  async (videoId: string): Promise<Video | null> => {
+    try {
+      // 2. 만약 백엔드 응답이 거의 안 변한다면 axios 설정에 캐시 관련 헤더를 확인하거나
+      // 아래와 같이 호출합니다.
+      const { data } = await api.get(`/videos/${videoId}`);
+      return data;
+    } catch (error) {
+      console.error("Fetch Video Detail Error:", error);
+      return null;
+    }
   }
-}
+);
 
 export async function createComment(videoId: number, content: string) {
   const user = await getUser();
